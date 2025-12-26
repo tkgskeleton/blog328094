@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ULTIMATE TASK NIGHT v8 - LOGIC FIXED</title>
+    <style>
+        :root { --bg: #050505; --panel: #1a1a1a; --accent: #ff0000; }
+        body { font-family: 'Consolas', monospace; background: var(--bg); color: white; margin: 0; overflow: hidden; user-select: none; }
+        
+        /* Menu */
+        #menu { padding: 20px; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow-y: auto; box-sizing: border-box; }
+        .presets { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px; max-width: 800px; }
+        .preset-btn { background: #333; color: #eee; border: 1px solid #555; padding: 8px 12px; cursor: pointer; font-size: 0.8em; border-radius: 4px; }
+        .preset-btn:hover { background: #555; border-color: #888; }
+
+        .ai-settings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .setting-box { background: var(--panel); border: 2px solid #333; padding: 10px; text-align: center; width: 180px; border-radius: 5px; }
+        input[type="number"] { width: 50px; background: #000; color: #0f0; border: 1px solid #555; font-size: 1.2em; text-align: center; border-radius: 3px; }
+        
+        .start-btn { padding: 15px 60px; font-size: 1.8em; background: #440000; color: white; border: 2px solid red; cursor: pointer; border-radius: 8px; font-weight: bold; }
+        .start-btn:hover { background: red; color: black; box-shadow: 0 0 20px red; }
+
+        /* Game Screen */
+        #game-screen { display: none; width: 100vw; height: 100vh; position: relative; background: #000; }
+        #game-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; gap: 15px; padding: 20px; height: 100%; box-sizing: border-box; }
+        .module { background: #080808; border: 2px solid #222; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; border-radius: 12px; }
+        .module-label { position: absolute; top: 8px; left: 10px; font-size: 0.85em; color: #555; font-weight: bold; letter-spacing: 1px; }
+        .module-status { position: absolute; top: 8px; right: 10px; font-size: 0.75em; font-weight: bold; }
+        .timer-bar { position: absolute; bottom: 0; left: 0; height: 6px; background: #f00; width: 0%; box-shadow: 0 0 5px red; }
+        
+        /* Flashlight */
+        #flashlight-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1000; background: black;
+            -webkit-mask-image: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), transparent 0%, black var(--radius, 100%));
+            mask-image: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), transparent 0%, black var(--radius, 100%));
+        }
+
+        /* Modules */
+        .puppet-btn { width: 85%; height: 50px; background: #222; color: #0f0; border: 2px solid #444; cursor: pointer; font-family: inherit; font-weight: bold; border-radius: 5px; }
+        .puppet-btn:active { background: #0f0; color: #000; }
+        .ms-grid { display: grid; grid-template-columns: repeat(5, 36px); gap: 4px; }
+        .ms-cell { width: 36px; height: 36px; background: #333; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; cursor: pointer; border-radius: 3px; }
+        .ms-cell.open { background: #111; border: 1px solid #222; }
+        .ms-cell.n1 { color: #00eaff; } .ms-cell.n2 { color: #00ff00; } .ms-cell.n3 { color: #ff00ff; }
+        .simon-p { width: 65px; height: 65px; opacity: 0.15; border-radius: 10px; cursor: pointer; transition: opacity 0.1s; }
+        .simon-p.active { opacity: 1; box-shadow: 0 0 15px white; }
+        .mem-cell { width: 32px; height: 32px; background: #222; border: 1px solid #333; cursor: pointer; border-radius: 4px; }
+        .rabbit-track { width: 90%; height: 40px; background: #151515; position: relative; border: 2px solid #333; border-radius: 20px; cursor: pointer; }
+        #trap { width: 20%; height: 100%; background: rgba(255,0,0,0.4); position: absolute; left: 40%; border-left: 2px solid #f00; border-right: 2px solid #f00; pointer-events: none; }
+        #rabbit { width: 22px; height: 22px; background: #fff; position: absolute; top: 9px; border-radius: 50%; pointer-events: none; margin-left: -11px; box-shadow: 0 0 10px #fff; }
+
+        #game-time { font-size: 3.5em; color: #0f0; font-weight: bold; text-shadow: 0 0 10px #0f0; }
+        #overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: black; z-index: 2000; flex-direction: column; justify-content: center; align-items: center; color: red; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div id="menu">
+    <h1>ULTIMATE TASK NIGHT</h1>
+    <div class="presets">
+        <button class="preset-btn" onclick="applyPreset([0,0,0,0,0,0])">DEFAULT</button>
+        <button class="preset-btn" onclick="applyPreset([10,0,0,10,10,0])">P1: EARLY NIGHT</button>
+        <button class="preset-btn" onclick="applyPreset([0,10,10,0,0,10])">P2: LATE NIGHT</button>
+        <button class="preset-btn" onclick="applyPreset([10,10,10,10,10,10])">P3: NIGHTMARE</button>
+        <button class="preset-btn" onclick="applyPreset([10,10,20,0,10,0])">P4: SIMON SAYS</button>
+        <button class="preset-btn" onclick="applyPreset([0,0,10,10,0,20])">P5: FLASH MEMORY</button>
+        <button class="preset-btn" onclick="applyPreset([20,10,0,10,20,0])">P6: PUPPET ATTACK</button>
+        <button class="preset-btn" onclick="applyPreset([20,20,20,20,20,0])">P7: BRIGHT RIGHT</button>
+        <button class="preset-btn" onclick="applyPreset([0,20,0,10,10,10])">P8: MINE</button>
+        <button class="preset-btn" onclick="applyPreset([20,20,20,20,20,20])">P9: NO ESCAPE</button>
+    </div>
+    <div class="ai-settings" id="settings-area"></div>
+    <div style="background:#111; padding: 15px; border-radius: 10px; border: 1px solid #333; margin-bottom: 20px;">
+        <label>LIMIT: <select id="time-limit" style="background:#000; color:#fff;"><option value="60">1m</option><option value="180" selected>3m</option><option value="360">6m</option></select></label>
+        <label style="margin-left: 20px;"><input type="checkbox" id="aggressive"> AGGRESSIVE MODE</label>
+    </div>
+    <button class="start-btn" onclick="startGame()">START NIGHT</button>
+</div>
+
+<div id="game-screen">
+    <div id="game-grid">
+        <div class="module" id="mod-puppet"><div class="module-label">PUPPET BOX</div><div class="module-status" style="color:#0f0">100%</div><div class="timer-bar"></div><button class="puppet-btn">WIND MUSIC BOX</button></div>
+        <div class="module" id="mod-minesweeper"><div class="module-label">MINESWEEPER</div><div class="module-status" style="color:#666">IDLE</div><div class="timer-bar"></div><div class="ms-grid"></div></div>
+        <div class="module" id="mod-simon"><div class="module-label">SIMON SAYS</div><div class="module-status" style="color:#666">IDLE</div><div class="timer-bar"></div><div class="simon-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"></div></div>
+        <div class="module" id="mod-memory"><div class="module-label">MEMORY TEST</div><div class="module-status" style="color:#666">IDLE</div><div class="timer-bar"></div><div class="memory-grid" style="display:grid; grid-template-columns:repeat(4,32px); gap:6px;"></div></div>
+        <div class="module" id="mod-rabbit"><div class="module-label">RABBIT TRAP</div><div class="module-status" style="color:#666">IDLE</div><div class="timer-bar"></div><div class="rabbit-track" onclick="clickRabbitTrap()"><div id="trap"></div><div id="rabbit"></div></div></div>
+        <div class="module" id="mod-clock"><div id="game-time">00:00</div></div>
+    </div>
+    <div id="flashlight-overlay"></div>
+</div>
+
+<div id="overlay">
+    <h1 id="over-reason">GAME OVER</h1>
+    <p id="over-detail" style="color:white; font-size: 1.2em;"></p>
+    <button onclick="location.reload()" style="padding:12px 50px; cursor:pointer; font-weight:bold; margin-top:20px; border-radius:5px;">RETRY</button>
+</div>
+
+<script>
+const modes = [{id:'puppet',name:'Puppet'},{id:'minesweeper',name:'Minesweeper'},{id:'simon',name:'Simon'},{id:'memory',name:'Memory'},{id:'rabbit',name:'Rabbit'},{id:'flashlight',name:'Flashlight'}];
+const settingsArea = document.getElementById('settings-area');
+modes.forEach(m => { settingsArea.innerHTML += `<div class="setting-box"><div>${m.name}</div><input type="number" id="ai-${m.id}" value="0" min="0" max="20"></div>`; });
+
+function applyPreset(v) { modes.forEach((m, i) => { document.getElementById(`ai-${m.id}`).value = v[i]; }); }
+
+function playNotify() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator(); const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(800, ctx.currentTime);
+        gain.gain.setValueAtTime(0.04, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+}
+
+let isGameOver = false, config = {}, globalClock;
+let timers = { minesweeper: null, simon: null, memory: null, rabbit: null };
+
+function resetModuleUI(id, statusText, color) {
+    const mod = document.getElementById(`mod-${id}`);
+    clearInterval(timers[id]);
+    mod.querySelector('.timer-bar').style.width = "0%";
+    const status = mod.querySelector('.module-status');
+    status.innerText = statusText;
+    status.style.color = color;
+}
+
+function startGame() {
+    modes.forEach(m => config[m.id] = parseInt(document.getElementById(`ai-${m.id}`).value));
+    config.aggressive = document.getElementById('aggressive').checked;
+    config.totalTime = parseInt(document.getElementById('time-limit').value);
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'block';
+    
+    if (config.flashlight > 0) {
+        const radius = 60 - (config.flashlight * 1.5); 
+        document.body.style.setProperty('--radius', radius + '%');
+        window.addEventListener('mousemove', e => {
+            document.body.style.setProperty('--mx', (e.clientX / window.innerWidth * 100) + '%');
+            document.body.style.setProperty('--my', (e.clientY / window.innerHeight * 100) + '%');
+        });
+    } else { document.getElementById('flashlight-overlay').style.display = 'none'; }
+
+    if (config.puppet > 0) initPuppet();
+    if (config.minesweeper > 0) waitNext(() => startMinesweeper());
+    if (config.simon > 0) waitNext(() => startSimon());
+    if (config.memory > 0) waitNext(() => startMemory());
+    if (config.rabbit > 0) waitNext(() => startRabbit());
+    
+    let timeLeft = config.totalTime;
+    globalClock = setInterval(() => {
+        timeLeft--;
+        document.getElementById('game-time').innerText = `${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')}`;
+        if (timeLeft <= 0) stopAll("6 AM: SURVIVED");
+    }, 1000);
+}
+
+function stopAll(reason) {
+    if (isGameOver) return;
+    isGameOver = true; clearInterval(globalClock);
+    Object.values(timers).forEach(t => clearInterval(t));
+    document.getElementById('overlay').style.display = 'flex';
+    document.getElementById('over-detail').innerText = reason;
+}
+
+function waitNext(fn) {
+    if (isGameOver) return;
+    const time = config.aggressive ? 800 : (7000 + Math.random() * 8000);
+    setTimeout(fn, time);
+}
+
+/* --- PUPPET --- */
+function initPuppet() {
+    const bar = document.querySelector('#mod-puppet .timer-bar');
+    const status = document.querySelector('#mod-puppet .module-status');
+    const btn = document.querySelector('.puppet-btn');
+    let val = 100, press = false;
+    btn.onmousedown = btn.ontouchstart = (e) => { e.preventDefault(); press = true; };
+    window.onmouseup = window.ontouchend = () => press = false;
+    function loop() {
+        if (isGameOver) return;
+        val += press ? (100/(5*60)) : -(100/((35-config.puppet)*60));
+        val = Math.max(0, Math.min(100, val));
+        bar.style.width = val + "%"; status.innerText = Math.floor(val) + "%";
+        status.style.color = val < 25 ? "#f00" : "#0f0";
+        if (val <= 0) stopAll("THE PUPPET BROKE FREE");
+        requestAnimationFrame(loop);
+    }
+    loop();
+}
+
+/* --- MINESWEEPER (LOGIC FIXED) --- */
+function startMinesweeper() {
+    if (isGameOver) return;
+    playNotify();
+    const gridEl = document.querySelector('#mod-minesweeper .ms-grid');
+    const bar = document.querySelector('#mod-minesweeper .timer-bar');
+    const status = document.querySelector('#mod-minesweeper .module-status');
+    status.innerText = "ACTIVE"; status.style.color = "#ff0";
+    gridEl.innerHTML = '';
+    
+    let active = true, first = true;
+    const limit = 50 - config.minesweeper; let time = limit;
+    const cells = Array.from({length:25}, (_, i) => ({ id:i, mine:false, open:false, el:null }));
+    
+    cells.forEach(c => { 
+        c.el = document.createElement('div'); c.el.className = 'ms-cell'; 
+        c.el.onclick = () => {
+            if (!active || cells[c.id].open) return;
+            if (first) {
+                // 初回の周囲を安全にする
+                const safeZone = [];
+                const cx = c.id%5, cy = Math.floor(c.id/5);
+                for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
+                    const nx=cx+dx, ny=cy+dy;
+                    if(nx>=0&&nx<5&&ny>=0&&ny<5) safeZone.push(ny*5+nx);
+                }
+                let minesPlaced = 0;
+                while(minesPlaced < 4) {
+                    let r = Math.floor(Math.random()*25);
+                    if (!safeZone.includes(r) && !cells[r].mine) {
+                        cells[r].mine = true; minesPlaced++;
+                    }
+                }
+                first = false;
+            }
+            if (cells[c.id].mine) return stopAll("MINESWEEPER EXPLODED");
+            
+            const flood = (idx) => {
+                if(idx<0 || idx>24 || cells[idx].open) return;
+                const x=idx%5, y=Math.floor(idx/5); let m=0;
+                for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
+                    const nx=x+dx, ny=y+dy; if(nx>=0 && nx<5 && ny>=0 && ny<5 && cells[ny*5+nx].mine) m++;
+                }
+                cells[idx].open = true; cells[idx].el.classList.add('open');
+                if(m > 0) { cells[idx].el.innerText = m; cells[idx].el.classList.add('n'+m); }
+                else { for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){
+                    const nx=x+dx, ny=y+dy; if(nx>=0 && nx<5 && ny>=0 && ny<5) flood(ny*5+nx);
+                }}
+            };
+            flood(c.id);
+            if (cells.filter(cl => cl.open).length >= (25 - 4)) {
+                active = false;
+                resetModuleUI('minesweeper', "COMPLETED", "#0f0");
+                waitNext(() => startMinesweeper());
+            }
+        };
+        gridEl.appendChild(c.el); 
+    });
+    timers.minesweeper = setInterval(() => {
+        time -= 0.1; bar.style.width = (time/limit*100) + "%";
+        if (time <= 0) stopAll("MINESWEEPER TIMEOUT");
+    }, 100);
+}
+
+/* --- SIMON --- */
+async function startSimon() {
+    if (isGameOver) return;
+    playNotify();
+    const grid = document.querySelector('#mod-simon .simon-grid');
+    const bar = document.querySelector('#mod-simon .timer-bar');
+    const status = document.querySelector('#mod-simon .module-status');
+    const colors = ['#f55', '#5f5', '#55f', '#ff5'];
+    grid.innerHTML = colors.map((c, i) => `<div class="simon-p" style="background:${c}" onclick="clickSim(${i})"></div>`).join('');
+    
+    status.innerText = "WATCHING"; status.style.color = "#0af";
+    let seq = Array.from({length:4}, () => Math.floor(Math.random()*4));
+    for (let s of seq) {
+        if (isGameOver) return;
+        await new Promise(r => setTimeout(r, 600));
+        grid.children[s].classList.add('active'); await new Promise(r => setTimeout(r, 400));
+        grid.children[s].classList.remove('active');
+    }
+    
+    let active = true, pIdx = 0;
+    status.innerText = "YOUR TURN"; status.style.color = "#0f0";
+    window.clickSim = (i) => {
+        if (!active) return;
+        if (i === seq[pIdx]) {
+            pIdx++;
+            if (pIdx === 4) {
+                active = false;
+                resetModuleUI('simon', "COMPLETED", "#0f0");
+                waitNext(() => startSimon());
+            }
+        } else stopAll("SIMON SEQUENCE FAILED");
+    };
+    const limit = 30-config.simon; let time = limit;
+    timers.simon = setInterval(() => {
+        time -= 0.1; bar.style.width = (time/limit*100) + "%";
+        if (time <= 0) stopAll("SIMON TIMEOUT");
+    }, 100);
+}
+
+/* --- MEMORY --- */
+async function startMemory() {
+    if (isGameOver) return;
+    playNotify();
+    const grid = document.querySelector('#mod-memory .memory-grid');
+    const bar = document.querySelector('#mod-memory .timer-bar');
+    const status = document.querySelector('#mod-memory .module-status');
+    
+    grid.innerHTML = '';
+    status.innerText = "MEMORIZE"; status.style.color = "#ff0";
+    const target = Array.from({length:16}, () => Math.random() > 0.65);
+    const current = Array(16).fill(false);
+    for(let i=0; i<16; i++){
+        const d = document.createElement('div'); d.className = 'mem-cell';
+        if (target[i]) d.style.background = '#0f0'; grid.appendChild(d);
+    }
+    await new Promise(r => setTimeout(r, 4500));
+    if (isGameOver) return;
+
+    status.innerText = "RECALL"; status.style.color = "#0af";
+    let active = true;
+    Array.from(grid.children).forEach((d, i) => {
+        d.style.background = '#222';
+        d.onclick = () => {
+            if (!active) return;
+            current[i] = !current[i]; d.style.background = current[i] ? '#0f0' : '#222';
+            if (current.every((v, idx) => v === target[idx])) {
+                active = false;
+                resetModuleUI('memory', "COMPLETED", "#0f0");
+                waitNext(() => startMemory());
+            }
+        };
+    });
+    const limit = 35-config.memory; let time = limit;
+    timers.memory = setInterval(() => {
+        time -= 0.1; bar.style.width = (time/limit*100) + "%";
+        if (time <= 0) stopAll("MEMORY TEST FAILED");
+    }, 1000/10);
+}
+
+/* --- RABBIT --- */
+function startRabbit() {
+    if (isGameOver) return;
+    playNotify();
+    const rabbit = document.getElementById('rabbit');
+    const bar = document.querySelector('#mod-rabbit .timer-bar');
+    const status = document.querySelector('#mod-rabbit .module-status');
+    
+    let active = true, rPos = 0, rDir = 1;
+    status.innerText = "ACTIVE"; status.style.color = "#f00";
+    window.clickRabbitTrap = () => {
+        if (!active) return;
+        // 40%から60%の間がトラップ範囲
+        if (rPos >= 40 && rPos <= 60) {
+            active = false;
+            resetModuleUI('rabbit', "TRAPPED", "#0f0");
+            waitNext(() => startRabbit());
+        } else stopAll("RABBIT ESCAPED");
+    };
+    const limit = 40-config.rabbit; let time = limit;
+    timers.rabbit = setInterval(() => {
+        time -= 0.03; bar.style.width = (time/limit*100) + "%";
+        rPos += rDir * (0.35 + config.rabbit/18);
+        if (rPos > 100 || rPos < 0) rDir *= -1;
+        rabbit.style.left = rPos + "%";
+        if (time <= 0) stopAll("RABBIT TRAP TIMEOUT");
+    }, 30);
+}
+</script>
+</body>
+</html>
