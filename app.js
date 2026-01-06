@@ -72,6 +72,10 @@ app.get("/custom", (req, res) => {
     res.render("custom");
 });
 
+app.get("/custom2", (req, res) => {
+    res.render("custom2");
+});
+
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
