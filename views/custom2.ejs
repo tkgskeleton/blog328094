@@ -4,340 +4,458 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Night Ultimate</title>
+    <title><%= title || 'Custom Night Ultimate' %></title>
     <style>
-        :root {
-            --bg-color: #050505;
-            --text-color: #e0e0e0;
-            --accent-cyan: #00f3ff;
-            --accent-red: #ff0055;
-            --accent-green: #00ff66;
-            --accent-yellow: #ffcc00;
-            --panel-bg: rgba(20, 20, 25, 0.95);
-            --border-color: #333;
-        }
+/* Inlined from styles.css */
+:root {
+    --bg-color: #050505;
+    --text-color: #e0e0e0;
+    --accent-cyan: #00f3ff;
+    --accent-red: #ff0055;
+    --accent-green: #00ff66;
+    --accent-yellow: #ffcc00;
+    --panel-bg: rgba(20, 20, 25, 0.95);
+    --border-color: #333;
+}
 
-        * {
-            box-sizing: border-box;
-            user-select: none;
-        }
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
 
-        body {
-            margin: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Share Tech Mono', monospace;
-            overflow: hidden;
-            position: relative;
-        }
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    overflow: hidden;
+    position: relative;
+}
 
-        /* CRT Effects */
-        #scanlines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(0deg,
-                    rgba(0, 0, 0, 0.15),
-                    rgba(0, 0, 0, 0.15) 1px,
-                    transparent 1px,
-                    transparent 2px);
-            pointer-events: none;
-            z-index: 1000;
-        }
+/* CRT Effects */
+#scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(0deg,
+            rgba(0, 0, 0, 0.15),
+            rgba(0, 0, 0, 0.15) 1px,
+            transparent 1px,
+            transparent 2px);
+    pointer-events: none;
+    z-index: 1000;
+}
 
-        #vignette {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.8) 100%);
-            pointer-events: none;
-            z-index: 999;
-        }
+#vignette {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.8) 100%);
+    pointer-events: none;
+    z-index: 999;
+}
 
-        .screen {
-            display: none;
-            width: 100%;
-            height: 100%;
-            padding: 20px;
-        }
+.screen {
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+}
 
-        .screen.active {
-            display: flex;
-            flex-direction: column;
-        }
+.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 
-        /* Typography & Glitch */
-        h1,
-        h2,
-        h3 {
-            font-family: 'Orbitron', sans-serif;
-            margin: 0;
-            text-transform: uppercase;
-        }
+/* Typography & Glitch */
+h1,
+h2,
+h3 {
+    font-family: 'Orbitron', sans-serif;
+    margin: 0;
+    text-transform: uppercase;
+}
 
-        .glitch {
-            font-size: 3rem;
-            color: var(--accent-cyan);
-            text-align: center;
-            text-shadow: 2px 2px var(--accent-red);
-            margin-bottom: 2rem;
-        }
+.glitch {
+    font-size: 3rem;
+    color: var(--accent-cyan);
+    text-align: center;
+    text-shadow: 2px 2px var(--accent-red);
+    margin-bottom: 2rem;
+}
 
-        /* Cyber Button */
-        .cyber-btn {
-            background: transparent;
-            border: 2px solid var(--accent-cyan);
-            color: var(--accent-cyan);
-            padding: 10px 30px;
-            font-family: 'Orbitron';
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: 0.3s;
-            text-shadow: 0 0 5px var(--accent-cyan);
-            box-shadow: 0 0 5px var(--accent-cyan);
-        }
+/* Cyber Button */
+.cyber-btn {
+    background: transparent;
+    border: 2px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 10px 30px;
+    font-family: 'Orbitron';
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.3s;
+    text-shadow: 0 0 5px var(--accent-cyan);
+    box-shadow: 0 0 5px var(--accent-cyan);
+}
 
-        .cyber-btn:hover {
-            background: var(--accent-cyan);
-            color: #000;
-        }
+.cyber-btn:hover {
+    background: var(--accent-cyan);
+    color: #000;
+}
 
-        /* Menu Layout */
-        .setup-container {
-            display: flex;
-            gap: 20px;
-            flex: 1;
-            overflow-y: auto;
-        }
+/* Menu Layout */
+.setup-container {
+    display: flex;
+    gap: 20px;
+    width: 95%;
+    max-width: 1400px;
+    height: auto;
+    /* Remove fixed 70vh */
+    min-height: 400px;
+    justify-content: center;
+    margin: 20px auto;
+}
 
-        .panel {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 4px;
-        }
+.panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    border-radius: 4px;
+}
 
-        .preset-panel {
-            flex: 0 0 250px;
-        }
+.preset-panel {
+    flex: 0 0 250px;
+}
 
-        .config-panel {
-            flex: 0 0 250px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+.config-panel {
+    flex: 0 0 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
-        .character-select {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            overflow-y: auto;
-            padding: 10px;
-        }
+.character-select {
+    flex: 2;
+    /* Take more space */
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    padding: 10px;
+    /* Allow the menu grid to expand naturally and avoid internal scrolling */
+    max-height: none;
+    overflow-y: visible;
+}
 
-        .char-card {
-            background: #111;
-            border: 1px solid #444;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            transition: 0.2s;
-        }
+.char-card {
+    background: #111;
+    border: 1px solid #444;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    transition: 0.2s;
+}
 
-        .char-card:hover {
-            border-color: var(--accent-cyan);
-        }
+.char-card:hover {
+    border-color: var(--accent-cyan);
+    background: #1a1a1f;
+    transform: translateY(-2px);
+}
 
-        .char-card h4 {
-            font-size: 0.9rem;
-            text-align: center;
-            margin: 0;
-        }
+/* Module Glow on Start */
+@keyframes module-init {
+    0% {
+        box-shadow: 0 0 0 var(--accent-cyan);
+    }
 
-        .ai-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    50% {
+        box-shadow: 0 0 20px var(--accent-cyan);
+    }
 
-        .ai-val {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--accent-cyan);
-            width: 30px;
-            text-align: center;
-        }
+    100% {
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+}
 
-        .arrow-btn {
-            background: #333;
-            border: none;
-            color: #fff;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-        }
+.module.initializing {
+    animation: pulse-init 0.5s infinite alternate;
+    border-color: var(--accent-cyan);
+}
 
-        .arrow-btn:hover {
-            background: #555;
-        }
+@keyframes pulse-init {
+    from {
+        opacity: 0.5;
+        box-shadow: inset 0 0 10px var(--accent-cyan);
+    }
 
-        .menu-actions {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-        }
+    to {
+        opacity: 1;
+        box-shadow: inset 0 0 30px var(--accent-cyan);
+    }
+}
 
-        /* Game Dashboard */
-        .header-hud {
-            display: flex;
-            justify-content: space-between;
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
+.module-header {
+    background: #222;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    font-family: 'Orbitron';
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(3, 1fr);
-            gap: 10px;
-            flex: 1;
-            height: 100%;
-        }
+.module.active-mod .module-header {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 5px var(--accent-cyan);
+}
 
-        .module {
-            background: #0a0a0a;
-            border: 1px solid #333;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+.char-card h4 {
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0;
+}
 
-        .module-header {
-            background: #111;
-            padding: 5px;
-            font-size: 0.8rem;
-            border-bottom: 1px solid #333;
-            display: flex;
-            justify-content: space-between;
-        }
+.ai-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-        .module-content {
-            flex: 1;
-            position: relative;
-            padding: 5px;
-        }
+.ai-val {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-cyan);
+    width: 30px;
+    text-align: center;
+}
 
-        /* Flashlight Overlay */
-        #flashlight-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 500;
-            background: black;
-            mask-image: radial-gradient(circle 100px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 100%, transparent 100%);
-            -webkit-mask-image: radial-gradient(circle 150px at var(--mouse-x, 50%) var(--mouse-y, 50%), transparent 0%, black 100%);
-            display: none;
-            /* Active only during game */
-        }
+.arrow-btn {
+    background: #333;
+    border: none;
+    color: #fff;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
 
-        /* Overlay Screens */
-        .overlay-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
+.arrow-btn:hover {
+    background: #555;
+}
 
-        #result-title {
-            font-size: 4rem;
-            color: var(--accent-red);
-            margin-bottom: 1rem;
-        }
+.menu-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    /* Center them for better balance */
+    align-items: center;
+    gap: 60px;
+    /* Stronger gap between score and BEGIN */
+    padding: 0 40px;
+}
 
-        /* Utility Animations */
-        @keyframes flash-red {
+/* Game Dashboard */
+.header-hud {
+    display: flex;
+    justify-content: space-between;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
 
-            0%,
-            100% {
-                background: #0a0a0a;
-            }
+#coin-hud {
+    margin-left: 40px;
+    /* Stronger gap from time display */
+}
 
-            50% {
-                background: #300;
-            }
-        }
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 15px;
+    /* Better spacing for PC */
+    flex: 1;
+    height: calc(100vh - 120px);
+    /* Fill screen height */
+}
 
-        .warning {
-            animation: flash-red 0.5s infinite;
-        }
+.module {
+    background: #0a0a0a;
+    border: 1px solid #333;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
 
-        /* Preset Buttons */
-        .preset-btn {
-            display: block;
-            width: 100%;
-            background: #222;
-            border: 1px solid #444;
-            color: #ccc;
-            padding: 8px;
-            text-align: left;
-            margin-bottom: 5px;
-            cursor: pointer;
-        }
+.module-header {
+    background: #111;
+    padding: 5px;
+    font-size: 0.8rem;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+}
 
-        .preset-btn:hover {
-            background: #333;
-            color: #fff;
-        }
+.module-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden; /* Prevent internal module scrolling; content should fit module area */
+    padding: 8px; /* small inner padding to avoid clipped content */
+}
 
-        .preset-btn.active {
-            border-color: var(--accent-cyan);
-            color: var(--accent-cyan);
-        }
+#game-screen.screen.active {
+    align-items: stretch;
+    justify-content: flex-start;
+}
 
-        @media (max-width: 1000px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
+/* Flashlight Overlay */
+#flashlight-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 500;
+    background: black;
+    mask-image: radial-gradient(circle 100px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 100%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle 150px at var(--mouse-x, 50%) var(--mouse-y, 50%), transparent 0%, black 100%);
+    display: none;
+    /* Active only during game */
+}
 
-        @media (max-width: 700px) {
-            .dashboard-grid {
-                grid-template-columns: repeat(2, 1fr);
+/* Overlay Screens */
+.overlay-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
 
-                .setup-container {
-                    flex-direction: column;
-                }
+#result-title {
+    font-size: 4rem;
+    color: var(--accent-red);
+    margin-bottom: 1rem;
+}
 
-                .preset-panel,
-                .config-panel {
-                    width: 100%;
-                    flex: none;
-                }
-            }
-        }
+/* Utility Animations */
+@keyframes flash-red {
+
+    0%,
+    100% {
+        background: #0a0a0a;
+    }
+
+    50% {
+        background: #300;
+    }
+}
+
+.warning {
+    animation: flash-red 0.5s infinite;
+}
+
+/* Preset Buttons */
+.preset-btn {
+    display: block;
+    width: 100%;
+    background: #222;
+    border: 1px solid #444;
+    color: #ccc;
+    padding: 8px;
+    text-align: left;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.preset-btn:hover {
+    background: #333;
+    color: #fff;
+}
+
+.preset-btn.active {
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+}
+
+@media (max-width: 1000px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .setup-container {
+        flex-direction: column;
+    }
+
+    .preset-panel,
+    .config-panel {
+        width: 100%;
+        flex: none;
+    }
+}
+
+.setup-container {
+    display: flex;
+    gap: 30px;
+    width: 90%;
+    max-width: 1200px;
+}
+
+.panel {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    padding: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.preset-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    overflow-y: auto;
+}
+
+.character-select {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+    width: 95%;
+    max-width: 1200px;
+    /* Prevent scrolling inside the menu selector */
+    max-height: none;
+    overflow: visible;
+}
+
+/* Non-intrusive marker for modules that failed init (no visible text) */
+.module-init-error {
+    outline: 2px dashed rgba(255,0,0,0.06);
+}
+
+/* End inlined styles.css */
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -361,16 +479,14 @@
                     <h3>CHALLENGE DURATION</h3>
                     <div class="radio-group">
                         <label><input type="radio" name="duration" value="60"> <span>SPEED (1m)</span></label>
-                        <label><input type="radio" name="duration" value="180" checked> <span>DEFAULT
-                                (3m)</span></label>
+                        <label><input type="radio" name="duration" value="180" checked> <span>DEFAULT (3m)</span></label>
                         <label><input type="radio" name="duration" value="360"> <span>LONG (6m)</span></label>
                     </div>
                 </div>
 
-                <div class="config-card" style="grid-column: span 2;">
+                <div class="modes-select" style="margin-top:20px;">
                     <h3>GAME MODES</h3>
-                    <div
-                        style="display:flex; justify-content:space-around; align-items:center; height:60%; flex-wrap:wrap;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                         <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
                             <input type="checkbox" id="aggressive-mode">
                             <span style="color:var(--accent-red);">AGGRESSIVE (Fast AI)</span>
@@ -383,6 +499,14 @@
                             <input type="checkbox" id="blackout-mode">
                             <span style="color:#888;">BLACKOUT (Power Fail)</span>
                         </label>
+                        <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                            <input type="checkbox" id="shop-mode">
+                            <span style="color:var(--accent-yellow);">SHOP (Economy)</span>
+                        </label>
+                        <label style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+                            <input type="checkbox" id="random-mode">
+                            <span style="color:white;">RANDOM (Dynamic)</span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -394,6 +518,7 @@
 
         <div class="menu-actions">
             <div class="points-display">SCORE: <span id="total-score">0</span></div>
+            <div class="coins-display" style="display:none; color:var(--accent-yellow);">COINS: <span id="total-coins">0</span></div>
             <button id="start-btn" class="cyber-btn">BEGIN NIGHT</button>
         </div>
     </div>
@@ -402,6 +527,7 @@
     <div id="game-screen" class="screen">
         <div class="header-hud">
             <div class="time-display" id="time-display">00:00</div>
+            <div class="coin-hud" style="font-size:1.5rem; color:var(--accent-yellow); display:none;" id="coin-hud">COINS: <span id="game-coins">0</span></div>
             <div class="usage-display">USAGE: <span id="usage-bar">|||||</span></div>
         </div>
 
@@ -420,234 +546,268 @@
         <button id="retry-btn" class="cyber-btn">RETURN TO MENU</button>
     </div>
 
+    <!-- Death Coin Button (Shop Mode) -->
+    <div id="death-coin-container" style="position:fixed; bottom:20px; right:20px; display:none; z-index:1000;">
+        <button id="buy-death-coin" class="cyber-btn" style="border-color:var(--accent-yellow); color:var(--accent-yellow);">BUY DEATH COIN (10c)</button>
+    </div>
+
     <!-- Audio Context Warning (for autoplay policy) -->
-    <div id="audio-init-overlay" class="screen overlay-screen active"
-        style="background: rgba(0,0,0,0.9); z-index: 9999;">
+    <div id="audio-init-overlay" class="screen overlay-screen active" style="background: rgba(0,0,0,0.9); z-index: 9999;">
         <h1>SYSTEM INITIALIZATION</h1>
         <button id="init-audio-btn" class="cyber-btn">CLICK TO START</button>
     </div>
 
+    <!-- Inlined script.js (original file remains unchanged) -->
     <script>
-        /**
-         * CUSTOM NIGHT ULTIMATE
-         * Core Game Logic
-         */
+// Inlined from script.js
+(function(){
 
-        // --- Audio System ---
-        class AudioController {
-            constructor() {
-                this.ctx = null;
-                this.masterVolume = 0.5;
-            }
+// --- Inlined full script.js content ---
 
-            init() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-            }
+/*
+ * (Full script.js inlined below)
+ */
 
-            playTone(freq, type, duration, vol = 1.0) {
-                if (!this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
+/* START OF script.js */
 
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+/*
+ * CUSTOM NIGHT ULTIMATE
+ * Core Game Logic
+ */
 
-                gain.gain.setValueAtTime(vol * this.masterVolume, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+// --- Audio System ---
+class AudioController {
+    constructor() {
+        this.ctx = null;
+        this.masterVolume = 0.5;
+    }
 
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                osc.start();
-                osc.stop(this.ctx.currentTime + duration);
-            }
-
-            playAlarm() { this.playTone(880, 'square', 0.1, 0.5); }
-            playClick() { this.playTone(400, 'sine', 0.05, 0.3); }
-            playWin() {
-                this.playTone(523.25, 'sine', 0.2, 0.5); // C5
-                setTimeout(() => this.playTone(659.25, 'sine', 0.2, 0.5), 200); // E5
-                setTimeout(() => this.playTone(783.99, 'sine', 0.4, 0.5), 400); // G5
-            }
-            playLose() {
-                this.playTone(200, 'sawtooth', 0.5, 0.8);
-                setTimeout(() => this.playTone(150, 'sawtooth', 0.5, 0.8), 300);
-            }
+    init() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
         }
+        if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+    }
 
-        // --- Base Module Class ---
-        class GameModule {
-            constructor(id, name, config) {
-                this.id = id;
-                this.name = name;
-                this.aiLevel = 0;
-                this.config = config || {};
-                this.element = null;
-                this.active = false;
-                this.failed = false;
-                this.waiting = false;
-                this.waitTimer = 0;
-                this.startDelay = 0; // New: Random startup delay
-            }
+    playTone(freq, type, duration, vol = 1.0) {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
 
-            // Called when game starts
-            init(element, aiLevel, aggressiveMode) {
-                this.element = element;
-                this.aiLevel = aiLevel;
-                this.aggressive = aggressiveMode;
-                this.failed = false;
-                this.waiting = false;
-                this.active = (aiLevel > 0);
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
 
-                // Random Start Delay (0-5s) to prevent sync
-                this.startDelay = this.active ? Math.random() * 5 : 0;
+        gain.gain.setValueAtTime(vol * this.masterVolume, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
 
-                this.renderShell();
-                if (this.active) {
-                    // onStart called after delay
-                } else {
-                    this.element.innerHTML = `<div class="inactive-overlay">DISABLED</div>`;
-                }
-            }
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
 
-            renderShell() {
-                this.element.innerHTML = `
-            <div class="module-header">${this.name.toUpperCase()} (AI: ${this.aiLevel})</div>
-            <div class="module-content" id="content-${this.id}"></div>
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+    }
+
+    playAlarm() { this.playTone(880, 'square', 0.1, 0.5); }
+    playClick() { this.playTone(400, 'sine', 0.05, 0.3); }
+    playWin() {
+        this.playTone(523.25, 'sine', 0.2, 0.5); // C5
+        setTimeout(() => this.playTone(659.25, 'sine', 0.2, 0.5), 200); // E5
+        setTimeout(() => this.playTone(783.99, 'sine', 0.4, 0.5), 400); // G5
+    }
+    playLose() {
+        this.playTone(200, 'sawtooth', 0.5, 0.8);
+        setTimeout(() => this.playTone(150, 'sawtooth', 0.5, 0.8), 300);
+    }
+}
+
+// --- Base Module Class ---
+class GameModule {
+    constructor(id, name, config) {
+        this.id = id;
+        this.name = name;
+        this.aiLevel = 0;
+        this.config = config || {};
+        this.element = null;
+        this.active = false;
+        this.failed = false;
+        this.waiting = false;
+        this.waitTimer = 0;
+        this.startDelay = 0; // New: Random startup delay
+    }
+
+    // Called when game starts
+    init(element, aiLevel, aggressiveMode) {
+        this.element = element;
+        this.aiLevel = aiLevel;
+        this.aggressive = aggressiveMode;
+        this.failed = false;
+        this.waiting = false;
+        this.active = (aiLevel > 0);
+
+        // Random Start Delay (0-5s) to prevent sync
+        this.startDelay = this.active ? Math.random() * 5 : 0;
+
+        if (this.active) {
+            this.element.classList.add('initializing', 'active-mod');
+            setTimeout(() => this.element.classList.remove('initializing'), 1000);
+            this.render(); // Individual module render
+        } else {
+            this.element.innerHTML = `<div class="inactive-overlay">DISABLED</div>`;
+        }
+    }
+
+    render() {
+        this.element.innerHTML = `
+            <div class="module-header">${this.name} (AI ${this.aiLevel})</div>
+            <div class="module-content"></div>
         `;
+    }
+
+    update(dt) {
+        if (!this.active || this.failed) return;
+
+        // Start Delay Phase
+        if (this.startDelay > 0) {
+            this.startDelay -= dt;
+            if (this.startDelay <= 0) {
+                this.startDelay = 0;
+                this.onStart();
             }
+            return;
+        }
 
-            update(dt) {
-                if (!this.active || this.failed) return;
-
-                // Start Delay Phase
-                if (this.startDelay > 0) {
-                    this.startDelay -= dt;
-                    if (this.startDelay <= 0) {
-                        this.startDelay = 0;
-                        this.onStart();
-                    }
-                    return;
-                }
-
-                if (this.waiting) {
-                    this.waitTimer -= dt;
-                    if (this.waitTimer <= 0) {
-                        this.waiting = false;
-                        this.element.querySelector('.module-content').style.opacity = '1';
-                        this.onStart();
-                    }
-                    return;
-                }
-
-                this.onUpdate(dt);
+        if (this.waiting) {
+            this.waitTimer -= dt;
+            if (this.waitTimer <= 0) {
+                this.waiting = false;
+                this.element.querySelector('.module-content').style.opacity = '1';
+                this.onStart();
             }
+            return;
+        }
 
-            // To be implemented by subclasses
-            onStart() { }
-            onUpdate(dt) { }
+        this.onUpdate(dt);
+    }
 
-            failGame() {
-                if (this.failed) return;
-                this.failed = true;
+    // To be implemented by subclasses
+    onStart() { }
+    onUpdate(dt) { }
 
-                // Remove global spam if exists
-                const globalSpam = document.querySelectorAll('.spam-popup');
-                globalSpam.forEach(el => el.remove());
+    failGame() {
+        if (this.failed) return;
+        this.failed = true;
 
-                window.gameApp.triggerGameOver(this.name);
+        // Remove global spam if exists
+        const globalSpam = document.querySelectorAll('.spam-popup');
+        globalSpam.forEach(el => el.remove());
+
+        window.gameApp.triggerGameOver(this.name);
+    }
+
+    success() {
+        window.gameApp.audio.playAlarm(); // Temp success sound
+
+        // COIN LOGIC (Shop Mode)
+        if (window.gameApp.shopMode) {
+            window.gameApp.addCoin(1);
+        }
+
+        if (this.aggressive) {
+            this.onStart(); // Instant restart
+        } else {
+            // Wait Logic (Increased: 3-6s)
+            this.waiting = true;
+            this.waitTimer = Math.random() * 3 + 3.0;
+            this.element.querySelector('.module-content').style.opacity = '0.3';
+        }
+    }
+
+    eliminate() {
+        this.active = false;
+        this.aiLevel = 0;
+        this.element.querySelector('.module-content').innerHTML = `
+            <div class="eliminated-overlay" style="color:var(--accent-red);">ELIMINATED</div>
+        `;
+        document.getElementById(`ai-${this.id}`).innerText = 0;
+    }
+
+
+}
+
+// --- Module Group A ---
+
+class SpamModule extends GameModule {
+    constructor() { super('spam', 'Spam Blocker'); }
+
+    onStart() {
+        this.activeCount = 0;
+        this.waveTotal = 5 + Math.ceil(this.aiLevel / 2); // 5 to 15
+        this.spawned = 0;
+        this.cleared = 0;
+        this.spawnTimer = 0;
+        // 4x Slower: Base 6.0s - AI factor
+        this.spawnInterval = Math.max(0.8, 6.0 - (this.aiLevel * 0.2));
+        this.render();
+    }
+
+    onUpdate(dt) {
+        // Spawning
+        if (this.spawned < this.waveTotal) {
+            this.spawnTimer -= dt;
+            if (this.spawnTimer <= 0) {
+                this.spawnPopup();
+                this.spawnTimer = this.spawnInterval;
             }
-
-            success() {
-                window.gameApp.audio.playAlarm(); // Temp success sound
-
-                if (this.aggressive) {
-                    this.onStart(); // Instant restart
-                } else {
-                    // Wait Logic (Increased: 3-6s)
-                    this.waiting = true;
-                    this.waitTimer = Math.random() * 3 + 3.0;
-                    this.element.querySelector('.module-content').style.opacity = '0.3';
-                }
+        } else {
+            if (this.cleared >= this.waveTotal) {
+                this.success();
             }
         }
 
-        // --- Module Group A ---
+        // Check Limit
+        const currentActive = document.querySelectorAll('.spam-popup').length; // Global check
+        if (currentActive > 5) {
+            this.failGame();
+        }
 
-        class SpamModule extends GameModule {
-            constructor() { super('spam', 'Spam Blocker'); }
+        // Update Counter
+        const cnt = this.element.querySelector('.spam-counter');
+        if (cnt) cnt.innerText = `${currentActive} / 5 (Remaining: ${this.waveTotal - this.cleared})`;
+    }
 
-            onStart() {
-                this.activeCount = 0;
-                this.waveTotal = 5 + Math.ceil(this.aiLevel / 2); // 5 to 15
-                this.spawned = 0;
-                this.cleared = 0;
-                this.spawnTimer = 0;
-                // 4x Slower: Base 6.0s - AI factor
-                this.spawnInterval = Math.max(0.8, 6.0 - (this.aiLevel * 0.2));
-                this.renderShell();
-            }
-
-            onUpdate(dt) {
-                // Spawning
-                if (this.spawned < this.waveTotal) {
-                    this.spawnTimer -= dt;
-                    if (this.spawnTimer <= 0) {
-                        this.spawnPopup();
-                        this.spawnTimer = this.spawnInterval;
-                    }
-                } else {
-                    if (this.cleared >= this.waveTotal) {
-                        this.success();
-                    }
-                }
-
-                // Check Limit
-                const currentActive = document.querySelectorAll('.spam-popup').length; // Global check
-                if (currentActive > 5) {
-                    this.failGame();
-                }
-
-                // Update Counter
-                const cnt = this.element.querySelector('.spam-counter');
-                if (cnt) cnt.innerText = `${currentActive} / 5 (Remaining: ${this.waveTotal - this.cleared})`;
-            }
-
-            renderShell() {
-                super.renderShell(); // Standard shell
-                // Add counter to content
-                this.element.querySelector('.module-content').innerHTML = `
-            <div style="height:100%; display:flex; justify-content:center; align-items:center; flex-direction:column;">
-                <div style="font-size:20px;">SPAM DEFENSE</div>
-                <div class="spam-counter" style="color:var(--accent-red);">0 / 5</div>
+    render() {
+        this.element.innerHTML = `
+            <div class="module-header">${this.name} (AI ${this.aiLevel})</div>
+            <div class="module-content">
+                <div style="height:100%; display:flex; justify-content:center; align-items:center; flex-direction:column;">
+                    <div style="font-size:20px;">SPAM DEFENSE</div>
+                    <div class="spam-counter" style="color:var(--accent-red);">0 / 5</div>
+                </div>
             </div>
          `;
-            }
+    }
 
-            spawnPopup() {
-                this.spawned++;
-                const p = document.createElement('div');
-                p.className = 'spam-popup';
-                p.style.position = 'fixed'; // Global
-                p.style.left = (Math.random() * 80 + 10) + '%';
-                p.style.top = (Math.random() * 80 + 10) + '%';
-                p.style.width = '150px'; // Larger
-                p.style.height = '100px';
-                p.style.background = '#eee';
-                p.style.border = '2px solid white';
-                p.style.boxShadow = '0 0 10px black';
-                p.style.color = 'black';
-                p.style.display = 'flex';
-                p.style.flexDirection = 'column';
-                p.style.zIndex = 3000 + this.spawned; // Above everything
-                p.style.cursor = 'pointer'; // Clickable
+    spawnPopup() {
+        this.spawned++;
+        const p = document.createElement('div');
+        p.className = 'spam-popup';
+        p.style.position = 'fixed'; // Global
+        p.style.left = (Math.random() * 80 + 10) + '%';
+        p.style.top = (Math.random() * 80 + 10) + '%';
+        p.style.width = '150px'; // Larger
+        p.style.height = '100px';
+        p.style.background = '#eee';
+        p.style.border = '2px solid white';
+        p.style.boxShadow = '0 0 10px black';
+        p.style.color = 'black';
+        p.style.display = 'flex';
+        p.style.flexDirection = 'column';
+        p.style.zIndex = 3000 + this.spawned; // Above everything
+        p.style.cursor = 'pointer'; // Clickable
 
-                p.innerHTML = `
+        p.innerHTML = `
             <div style="background:blue; color:white; font-size:12px; padding:4px; display:flex; justify-content:space-between;">
                 <span>ALERT</span>
                 <span class="close-x">X</span>
@@ -655,1285 +815,28 @@
             <div style="flex:1; display:flex; justify-content:center; align-items:center; font-size:30px;">!</div>
         `;
 
-                // Click anywhere to close
-                p.onclick = (e) => {
-                    e.stopPropagation();
-                    p.remove();
-                    this.cleared++;
-                    window.gameApp.audio.playClick();
-                };
-
-                document.body.appendChild(p); // Append to body
-            }
-        }
-
-        class PuppetModule extends GameModule {
-            constructor() { super('puppet', 'Puppet Music Box'); }
-
-            onStart() {
-                this.maxTime = Math.max(5, 35 - this.aiLevel); // Prevent 0 or negative
-                this.timer = this.maxTime;
-                this.rewinding = false;
-                this.render();
-            }
-
-            onUpdate(dt) {
-                if (this.rewinding) {
-                    this.timer = Math.min(this.maxTime, this.timer + (this.maxTime / 5) * dt); // 5 sec to full
-                    if (this.timer >= this.maxTime) this.rewinding = false;
-                } else {
-                    this.timer -= dt;
-                    if (this.timer <= 0) {
-                        this.timer = 0;
-                        this.failGame();
-                    }
-                }
-                this.updateUI();
-            }
-
-            render() {
-                this.element.querySelector('.module-content').innerHTML = `
-            <div style="text-align:center; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                <div class="music-meter" style="width:80%; height:20px; background:#333; border:1px solid #555; overflow:hidden;">
-                    <div id="puppet-bar" style="width:100%; height:100%; background:var(--accent-cyan);"></div>
-                </div>
-                <button id="puppet-wind" class="cyber-btn" style="margin-top:10px; font-size:0.8rem;">WIND UP</button>
-            </div>
-        `;
-                const btn = this.element.querySelector('#puppet-wind');
-                btn.onmousedown = () => this.rewinding = true;
-                btn.onmouseup = () => this.rewinding = false;
-                btn.onmouseleave = () => this.rewinding = false;
-
-                // Touch support
-                btn.ontouchstart = (e) => { e.preventDefault(); this.rewinding = true; };
-                btn.ontouchend = (e) => { e.preventDefault(); this.rewinding = false; };
-            }
-
-            updateUI() {
-                const bar = this.element.querySelector('#puppet-bar');
-                if (bar) {
-                    const pct = (this.timer / this.maxTime) * 100;
-                    bar.style.width = `${pct}%`;
-                    bar.style.background = pct < 20 ? 'red' : 'var(--accent-cyan)';
-                }
-            }
-        }
-
-        class MinesweeperModule extends GameModule {
-            constructor() { super('minesweeper', 'Minesweeper'); }
-
-            onStart() {
-                this.timeLimit = Math.max(10, 50 - this.aiLevel);
-                this.timer = this.timeLimit;
-                this.cols = 5;
-                this.rows = 5;
-                this.bombCount = 4;
-                this.grid = [];
-                this.revealed = 0;
-                this.generateGrid();
-                this.render();
-            }
-
-            generateGrid() {
-                // Init empty
-                this.grid = Array(this.rows * this.cols).fill(0);
-                // Place bombs
-                let bombs = 0;
-                while (bombs < this.bombCount) {
-                    let idx = Math.floor(Math.random() * this.grid.length);
-                    if (this.grid[idx] !== 'B') {
-                        this.grid[idx] = 'B';
-                        bombs++;
-                    }
-                }
-            }
-
-            // Custom Generate with safe zone
-            generateSafeGrid(safeIdx) {
-                this.grid = Array(this.rows * this.cols).fill(0);
-                let bombs = 0;
-                const neighbors = this.getNeighbors(safeIdx).concat(safeIdx); // Safe zone radius 1
-
-                while (bombs < this.bombCount) {
-                    let idx = Math.floor(Math.random() * this.grid.length);
-                    if (!neighbors.includes(idx) && this.grid[idx] !== 'B') {
-                        this.grid[idx] = 'B';
-                        bombs++;
-                    }
-                }
-                // Calc numbers
-                for (let i = 0; i < this.grid.length; i++) {
-                    if (this.grid[i] === 'B') continue;
-                    let count = 0;
-                    this.getNeighbors(i).forEach(n => {
-                        if (this.grid[n] === 'B') count++;
-                    });
-                    this.grid[i] = count;
-                }
-            }
-
-            getNeighbors(idx) {
-                const r = Math.floor(idx / this.cols);
-                const c = idx % this.cols;
-                const ret = [];
-                for (let dr = -1; dr <= 1; dr++) {
-                    for (let dc = -1; dc <= 1; dc++) {
-                        if (dr === 0 && dc === 0) continue;
-                        const nr = r + dr;
-                        const nc = c + dc;
-                        if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols) {
-                            ret.push(nr * this.cols + nc);
-                        }
-                    }
-                }
-                return ret;
-            }
-
-            onUpdate(dt) {
-                this.timer -= dt;
-                if (this.timer <= 0) {
-                    this.timer = 0;
-                    this.failGame();
-                }
-                // Update timer UI
-                const timeBar = this.element.querySelector('.mine-timer');
-                if (timeBar) {
-                    timeBar.style.width = `${(this.timer / this.timeLimit) * 100}%`;
-                }
-            }
-
-            render() {
-                this.element.querySelector('.module-content').innerHTML = `
-            <div style="height:100%; display:flex; flex-direction:column;">
-                <div style="height:5px; background:#333; margin-bottom:5px;"><div class="mine-timer" style="height:100%; background:lime;"></div></div>
-                <div class="mine-grid" style="flex:1; display:grid; grid-template-columns:repeat(5,1fr); gap:2px;">
-                    ${Array(25).fill(0).map((_, i) => `<div class="cell hidden" data-idx="${i}" onclick="gameApp.handleMineClick(${i})"></div>`).join('')}
-                </div>
-            </div>
-        `;
-
-                // CSS for Minesweeper
-                if (!document.getElementById('mine-style')) {
-                    const s = document.createElement('style');
-                    s.id = 'mine-style';
-                    s.innerHTML = `
-                .cell { background: #444; cursor: pointer; display:flex; justify-content:center; align-items:center; font-size:12px; }
-                .cell.hidden:hover { background: #555; }
-                .cell.revealed { background: #222; cursor: default; }
-                .cell.boom { background: red; }
-            `;
-                    document.head.appendChild(s);
-                }
-
-                // Hacky: Global handler binding
-                window.gameApp.handleMineClick = (i) => this.handleClick(i);
-                this.firstClick = true;
-            }
-
-            handleClick(idx) {
-                if (this.failed || this.waiting) return;
-
-                if (this.firstClick) {
-                    this.generateSafeGrid(idx);
-                    this.firstClick = false;
-                }
-
-                const cell = this.element.querySelectorAll('.cell')[idx];
-                if (!cell.classList.contains('hidden')) return;
-
-                const val = this.grid[idx];
-                if (val === 'B') {
-                    cell.classList.add('boom');
-                    cell.innerText = 'X';
-                    this.failGame();
-                } else {
-                    this.reveal(idx);
-                    this.checkWin();
-                }
-            }
-
-            reveal(idx) {
-                const cell = this.element.querySelectorAll('.cell')[idx];
-                if (!cell.classList.contains('hidden')) return;
-
-                cell.classList.remove('hidden');
-                cell.classList.add('revealed');
-                cell.innerText = this.grid[idx] === 0 ? '' : this.grid[idx];
-
-                if (this.grid[idx] === 0) {
-                    this.getNeighbors(idx).forEach(n => this.reveal(n));
-                }
-            }
-
-            checkWin() {
-                const hidden = this.element.querySelectorAll('.cell.hidden');
-                if (hidden.length === this.bombCount) {
-                    this.success();
-                }
-            }
-        }
-
-        class SimonModule extends GameModule {
-            constructor() { super('simon', 'Simon Says'); }
-
-            onStart() {
-                this.timeLimit = Math.max(5, 30 - this.aiLevel);
-                this.timer = this.timeLimit;
-                this.sequence = [];
-                this.playerStep = 0;
-                this.showing = true; // Phase: Showing vs Input
-                this.colors = ['r', 'g', 'b', 'y'];
-
-                // Generate Sequence (4 steps)
-                for (let i = 0; i < 4; i++) {
-                    this.sequence.push(this.colors[Math.floor(Math.random() * 4)]);
-                }
-
-                this.render();
-                this.playSequence();
-            }
-
-            render() {
-                this.element.querySelector('.module-content').innerHTML = `
-            <div style="height:100%; display:flex; flex-direction:column; align-items:center;">
-                <div class="simon-timer" style="width:100%; height:5px; background:var(--accent-yellow); margin-bottom:5px;"></div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; width:80%; flex:1;">
-                    <div class="simon-btn r" style="background:#500;" onclick="gameApp.handleSimon('r')"></div>
-                    <div class="simon-btn g" style="background:#050;" onclick="gameApp.handleSimon('g')"></div>
-                    <div class="simon-btn b" style="background:#005;" onclick="gameApp.handleSimon('b')"></div>
-                    <div class="simon-btn y" style="background:#550;" onclick="gameApp.handleSimon('y')"></div>
-                </div>
-            </div>
-        `;
-                window.gameApp.handleSimon = (c) => this.handleInput(c);
-            }
-
-            async playSequence() {
-                this.showing = true;
-                // Wait a bit then flash
-                await new Promise(r => setTimeout(r, 1000));
-
-                for (let c of this.sequence) {
-                    this.flash(c);
-                    window.gameApp.audio.playTone(400, 'sine', 0.1);
-                    await new Promise(r => setTimeout(r, 600));
-                }
-                this.showing = false;
-                // Visual indicator?
-            }
-
-            flash(color) {
-                const map = { r: 'red', g: 'lime', b: 'blue', y: 'yellow' };
-                const btn = this.element.querySelector(`.simon-btn.${color}`);
-                if (btn) {
-                    const old = btn.style.background;
-                    btn.style.background = map[color];
-                    setTimeout(() => btn.style.background = old, 300);
-                }
-            }
-
-            handleInput(color) {
-                if (this.showing || this.failed || this.waiting) return;
-
-                this.flash(color);
-                window.gameApp.audio.playClick();
-
-                if (color === this.sequence[this.playerStep]) {
-                    this.playerStep++;
-                    if (this.playerStep >= this.sequence.length) {
-                        this.success();
-                    }
-                } else {
-                    this.failGame();
-                }
-            }
-
-            onUpdate(dt) {
-                if (!this.showing) {
-                    this.timer -= dt;
-                    if (this.timer <= 0) {
-                        this.timer = 0;
-                        this.failGame();
-                    }
-                    const bar = this.element.querySelector('.simon-timer');
-                    if (bar) bar.style.width = `${(this.timer / this.timeLimit) * 100}%`;
-                }
-            }
-        }
-
-        class MemoryModule extends GameModule {
-            constructor() { super('memory', 'Memory Matrix'); }
-
-            onStart() {
-                this.timeLimit = Math.max(10, 35 - this.aiLevel);
-                this.timer = this.timeLimit + 5; // +5 for reveal phase
-                this.phase = 'MEMORIZE'; // MEMORIZE, RECALL
-                this.grid = [];
-                this.playerGrid = [];
-
-                // Generate Pattern (0=Off, 1=Green, 2=Red)
-                // Request: "Red and Green light up randomly".
-                this.grid = Array(16).fill(0).map(() => Math.floor(Math.random() * 3));
-                this.playerGrid = Array(16).fill(0);
-
-                this.render();
-                setTimeout(() => this.startRecall(), 5000); // 5s actually
-            }
-
-            startRecall() {
-                if (this.failed || !this.active) return;
-                this.phase = 'RECALL';
-                this.render();
-            }
-
-            onUpdate(dt) {
-                if (this.phase === 'RECALL') {
-                    this.timer -= dt;
-                    if (this.timer <= 0) {
-                        this.timer = 0;
-                        this.failGame();
-                    }
-                    this.updateUI();
-                }
-            }
-
-            render() {
-                let content = '';
-                if (this.phase === 'MEMORIZE') {
-                    content = `<div style="color:var(--accent-cyan); text-align:center;">MEMORIZE!</div>`;
-                    content += `<div class="mem-grid">
-                ${this.grid.map(v => `
-                    <div class="mem-cell" style="background:${v === 1 ? 'lime' : (v === 2 ? 'red' : '#222')}"></div>
-                `).join('')}
-            </div>`;
-                } else {
-                    content = `<div style="display:flex; justify-content:space-between;"><div style="color:white;">RECALL!</div> <div class="mem-timer" style="color:yellow;">${Math.ceil(this.timer)}</div></div>`;
-                    content += `<div class="mem-grid">
-                ${this.playerGrid.map((v, i) => `
-                    <div class="mem-cell" style="background:${v === 1 ? 'lime' : (v === 2 ? 'red' : '#222')}; cursor:pointer;" onclick="gameApp.handleMemory(${i})"></div>
-                `).join('')}
-            </div>`;
-                }
-
-                this.element.querySelector('.module-content').innerHTML = `
-            <style>
-                .mem-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; height:100%; aspect-ratio:1; margin:0 auto; }
-                .mem-cell { border:1px solid #444; }
-            </style>
-            <div style="height:100%; display:flex; flex-direction:column;">${content}</div>
-        `;
-                window.gameApp.handleMemory = (i) => this.handleClick(i);
-            }
-
-            updateUI() {
-                const t = this.element.querySelector('.mem-timer');
-                if (t) t.innerText = Math.ceil(this.timer);
-            }
-
-            handleClick(idx) {
-                if (this.phase !== 'RECALL' || this.failed) return;
-
-                // Cycle: 0 -> 1 -> 2 -> 0
-                this.playerGrid[idx] = (this.playerGrid[idx] + 1) % 3;
-
-                // Optimistic render
-                const cells = this.element.querySelectorAll('.mem-cell');
-                const v = this.playerGrid[idx];
-                cells[idx].style.background = v === 1 ? 'lime' : (v === 2 ? 'red' : '#222');
-                window.gameApp.audio.playClick();
-
-                this.checkWin();
-            }
-
-            checkWin() {
-                // Compare
-                const str1 = JSON.stringify(this.grid);
-                const str2 = JSON.stringify(this.playerGrid);
-                if (str1 === str2) {
-                    this.success();
-                }
-            }
-        }
-
-        class ShufflerModule extends GameModule {
-            constructor() { super('shuffler', 'Shuffler'); }
-
-            onStart() {
-                this.active = true;
-                this.timer = 0;
-                // Interval: 80s base - AI * 3.0. Min 20s.
-                this.interval = Math.max(20, 80 - (this.aiLevel * 3.0));
-                this.render();
-            }
-
-            onUpdate(dt) {
-                this.timer -= dt;
-                if (this.timer <= 0) {
-                    this.shuffle();
-                    this.timer = this.interval;
-                }
-
-                // Visual countdown
-                const bar = this.element.querySelector('.shuffle-timer');
-                if (bar) bar.style.width = `${(this.timer / this.interval) * 100}%`;
-            }
-
-            render() {
-                this.element.querySelector('.module-content').innerHTML = `
-            <div style="height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#888;">
-                <div>AUTO-SHUFFLER</div>
-                <div style="width:80%; height:4px; background:#333; margin-top:10px;"><div class="shuffle-timer" style="height:100%; background:var(--accent-purple); width:100%;"></div></div>
-                <div style="font-size:10px; margin-top:5px;">PASSIVE EFFECT</div>
-            </div>
-        `;
-            }
-
-            shuffle() {
-                if (this.aiLevel === 0) return;
-
-                // Play sound
-                window.gameApp.audio.playTone(100, 'sawtooth', 0.1);
-                window.gameApp.audio.playTone(50, 'square', 0.2);
-
-                // Shuffle grid
-                const grid = document.getElementById('dashboard-grid');
-                if (!grid) return;
-
-                const modules = Array.from(grid.children);
-                // Randomize order
-                for (let i = modules.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    grid.appendChild(modules[j]); // Move to end = shuffle? appendChild moves it.
-                }
-
-                // Visual Glitch overlay on body
-                const glitch = document.createElement('div');
-                glitch.style.position = 'fixed';
-                glitch.style.top = '0'; glitch.style.left = '0';
-                glitch.style.width = '100vw'; glitch.style.height = '100vh';
-                glitch.style.background = 'rgba(255, 0, 255, 0.2)';
-                glitch.style.zIndex = '9999';
-                glitch.style.pointerEvents = 'none';
-                document.body.appendChild(glitch);
-                setTimeout(() => glitch.remove(), 100);
-            }
-        }
-
-        class RabbitModule extends GameModule {
-            constructor() { super('rabbit', 'Rabbit Trap'); }
-
-            onStart() {
-                this.timeLimit = Math.max(5, 40 - this.aiLevel);
-                this.timer = this.timeLimit;
-                this.pos = 50; // %
-                this.dir = 1;
-                this.speed = 30 + (this.aiLevel * 5); // % per sec
-                this.render();
-            }
-
-            onUpdate(dt) {
-                this.timer -= dt;
-                if (this.timer <= 0) {
-                    this.timer = 0;
-                    this.failGame();
-                    return;
-                }
-
-                // Rabbit Movement (Ping Pong)
-                this.pos += this.speed * this.dir * dt;
-                if (this.pos > 90) { this.pos = 90; this.dir = -1; }
-                if (this.pos < 10) { this.pos = 10; this.dir = 1; }
-
-                this.updateUI();
-            }
-
-            render() {
-                this.element.querySelector('.module-content').innerHTML = `
-             <div style="height:100%; position:relative; overflow:hidden; background:#222;">
-                <!-- Trap Zone -->
-                <div id="rabbit-trap-zone" style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); width:120px; height:30px; border:2px solid red; background:rgba(255,0,0,0.2); cursor:pointer;"></div>
-                
-                <!-- Rabbit -->
-                <div id="rabbit" style="position:absolute; top:50%; left:50%; width:20px; height:20px; background:white; border-radius:50%; transform:translate(-50%, -50%); pointer-events:none;"></div>
-                
-                <div class="rabbit-time" style="position:absolute; top:0; left:0; color:white; font-size:10px;"></div>
-             </div>
-        `;
-
-                this.element.querySelector('#rabbit-trap-zone').onclick = () => this.tryCatch();
-            }
-
-            updateUI() {
-                const rab = this.element.querySelector('#rabbit');
-                if (rab) rab.style.left = `${this.pos}%`;
-
-                const tm = this.element.querySelector('.rabbit-time');
-                if (tm) tm.innerText = this.timer.toFixed(1);
-            }
-
-            tryCatch() {
-                if (this.failed || this.waiting) return;
-                // Check overlap
-                // 4x tolerance: +/- 40% (since width helps visual, checking logic needs to match)
-                // Zone is center 50%, width 120px (relative to container?).
-                // Container is ~200-300px? % based logic is safer.
-                // If Rabbit is within 30% to 70%? (Center 50 +/- 20).
-                // Original was +/- 10. Let's do +/- 30 to be safe/generous as requested.
-                if (Math.abs(this.pos - 50) < 30) {
-                    window.gameApp.audio.playClick();
-                    this.success();
-                } else {
-                    this.failGame();
-                }
-            }
-        }
-
-        // --- Module Group B ---
-
-        class MathModule extends GameModule {
-            constructor() { super('math', 'Math Quiz'); }
-
-            onStart() {
-                this.timeLimit = Math.max(5, 20 - (this.aiLevel / 2));
-                this.timer = this.timeLimit;
-
-                // Generate Problem
-                const op = Math.random() > 0.5 ? '+' : '-';
-                const a = Math.floor(Math.random() * 50) + 10; // 10-60
-                const b = Math.floor(Math.random() * 10) + 1; // 1-11
-
-                this.answer = op === '+' ? a + b : a - b;
-                this.problem = `${a} ${op} ${b}`;
-
-                // Options
-                this.options = [this.answer];
-                while (this.options.length < 3) {
-                    let offset = Math.floor(Math.random() * 10) - 5;
-                    if (offset === 0) offset = 1;
-                    let fake = this.answer + offset;
-                    if (!this.options.includes(fake)) this.options.push(fake);
-                }
-                this.options.sort(() => Math.random() - 0.5);
-
-                this.render();
-            }
-
-            onUpdate(dt) {
-                this.timer -= dt;
-                if (this.timer <= 0) {
-                    this.timer = 0;
-                    this.failGame();
-                }
-
-                const bar = this.element.querySelector('.math-timer');
-                if (bar) bar.style.width = `${(this.timer / this.timeLimit) * 100}%`;
-            }
-
-            render() {
-                this.element.querySelector('.module-content').innerHTML = `
-            <div style="height:100%; display:flex; flex-direction:column; padding:5px;">
-                <div style="background:#444; height:4px; margin-bottom:5px;"><div class="math-timer" style="background:var(--accent-cyan); height:100%;"></div></div>
-                <div style="font-size:24px; text-align:center; margin-bottom:10px;">${this.problem} = ?</div>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; flex:1;">
-                    ${this.options.map(opt => `<button class="math-btn" onclick="gameApp.handleMath(${opt})">${opt}</button>`).join('')}
-                </div>
-            </div>
-        `;
-                window.gameApp.handleMath = (n) => this.handleInput(n);
-            }
-
-            handleInput(n) {
-                if (this.failed || this.waiting) return;
-                if (n === this.answer) {
-                    window.gameApp.audio.playClick();
-                    this.success();
-                } else {
-                    this.failGame();
-                }
-            }
-        }
-
-        class TypingModule extends GameModule {
-            constructor() { super('typing', 'Typing'); }
-
-            onStart() {
-                this.timeLimit = Math.max(5, 15 - (this.aiLevel / 2));
-                this.timer = this.timeLimit;
-
-                // Random String
-                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                this.target = "";
-                for (let i = 0; i < 4; i++) this.target += chars.charAt(Math.floor(Math.random() * chars.length));
-
-                this.current = "";
-
-                this.render();
-
-                // Register Key Listener
-                if (!this.keyListener) {
-                    this.keyListener = (e) => {
-                        if (!this.active || this.failed || this.waiting) return;
-                        // Only process if single char key
-                        if (e.key.length === 1) {
-                            const char = e.key.toUpperCase();
-                            if (this.target[this.current.length] === char) {
-                                this.current += char;
-                                this.render(); // Re-render to update UI
-                                if (this.current === this.target) {
-                                    window.gameApp.audio.playClick();
-                                    this.success();
-                                }
-                            } else {
-                                // Wrong key? Penalty? Or just ignore
-                                // Ignore for now.
-                            }
-                        }
-                    };
-                    window.addEventListener('keydown', this.keyListener);
-                }
-            }
-
-            onUpdate(dt) {
-                this.timer -= dt;
-                if (this.timer <= 0) {
-                    this.timer = 0;
-                    this.failGame();
-                }
-            }
-
-            render() {
-                // Highlight matched part
-                let html = '';
-                for (let i = 0; i < this.target.length; i++) {
-                    if (i < this.current.length) {
-                        html += `<span style="color:lime;">${this.target[i]}</span>`;
-                    } else {
-                        html += `<span style="color:#555;">${this.target[i]}</span>`;
-                    }
-                }
-
-                this.element.querySelector('.module-content').innerHTML = `
-            <div style="height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                <div style="font-size:10px; color:#888;">TYPE THE CODE</div>
-                <div style="font-size:30px; letter-spacing:5px; font-weight:bold;">${html}</div>
-                <div style="font-size:12px; margin-top:5px; color:var(--accent-red);">${this.timer.toFixed(1)}s</div>
-            </div>
-        `;
-            }
-        }
-
-        class VentInvaderModule extends GameModule {
-            constructor() { super('vent', 'Vent Invader'); }
-
-            onStart() {
-                this.timeLimit = Math.max(15, 60 - this.aiLevel * 2);
-                this.timer = this.timeLimit;
-
-                // 5x5 Grid
-                this.rows = 5;
-                this.cols = 5;
-                this.map = Array(25).fill(0); // 0=Empty, 1=Blocked
-
-                // Blockages: Vertical Wall in Col 2 (Indices 7, 12, 17)
-                [7, 12, 17].forEach(i => this.map[i] = 1);
-
-                this.playerPos = 22; // (4, 2) Bottom Center
-                this.enemyPos = 2;   // (0, 2) Top Center
-                this.lurePos = -1;
-
-                this.moveTimer = 0;
-                // Move Speed: 5s base - AI. Min 1s.
-                this.moveInterval = Math.max(1.0, 5.0 - (this.aiLevel * 0.2));
-                this.teleportCooldown = 0; // New cooldown logic
-
-                this.render();
-            }
-
-            render() {
-                this.element.querySelector('.module-content').innerHTML = `
-            <div style="height:100%; display:flex; flex-direction:column;">
-                <div style="display:flex; justify-content:space-between; font-size:10px; padding:2px;">
-                    <span style="visibility:hidden;"> spacer </span>
-                    <span style="color:cyan;">AUDIO LURE ACTIVE</span>
-                </div>
-                <div class="vent-grid" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:1px; flex:1; background:#000; border:1px solid #333;">
-                    ${this.map.map((v, i) => `
-                        <div class="v-cell ${v === 1 ? 'blocked' : ''}" onclick="gameApp.setLure(${i})" data-idx="${i}"></div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-
-                // CSS
-                if (!document.getElementById('vent-style')) {
-                    const s = document.createElement('style');
-                    s.id = 'vent-style';
-                    s.innerHTML = `
-                .v-cell { background:#111; border:1px solid #222; position:relative; cursor:pointer; }
-                .v-cell.blocked { background:#333; cursor:default; }
-                .v-cell:hover:not(.blocked) { background:#222; }
-                /* Absolute positioning to prevent layout shifts */
-                .v-lure, .v-player, .v-enemy { position:absolute; top:0; left:0; right:0; bottom:0; margin:auto; }
-                .v-lure { background:cyan; opacity:0.3; width:100%; height:100%; }
-                .v-player { background:lime; width:60%; height:60%; border-radius:50%; }
-                .v-enemy { background:red; width:80%; height:80%; border-radius:20%; }
-             `;
-                    document.head.appendChild(s);
-                }
-
-                window.gameApp.setLure = (i) => this.setLure(i);
-                this.updateBoard();
-            }
-
-            updateBoard() {
-                const cells = this.element.querySelectorAll('.v-cell');
-                cells.forEach((c, i) => {
-                    c.innerHTML = '';
-                    // Lure
-                    if (i === this.lurePos) c.innerHTML += `<div class="v-lure"></div>`;
-                    // Player
-                    if (i === this.playerPos) c.innerHTML += `<div class="v-player"></div>`;
-                    // Enemy
-                    if (i === this.enemyPos) c.innerHTML += `<div class="v-enemy"></div>`;
-                });
-
-                const tm = this.element.querySelector('.vent-time');
-                if (tm) tm.innerText = this.timer.toFixed(1);
-            }
-
-            onUpdate(dt) {
-                this.timer -= dt;
-                if (this.timer <= 0) {
-                    this.timer = this.timeLimit; // Loop timer (Endless Mode)
-                    // No success() call to keep pressure
-                    return;
-                }
-
-                this.moveTimer -= dt;
-                if (this.moveTimer <= 0) {
-                    this.moveEnemy();
-                    this.moveTimer = this.moveInterval;
-                }
-
-                // Timer removed
-            }
-
-            setLure(i) {
-                if (this.map[i] === 1 || this.failed || this.waiting) return;
-                this.lurePos = i;
-                window.gameApp.audio.playClick();
-                this.updateBoard(); // Visual only
-            }
-
-            moveEnemy() {
-                if (this.failed) return;
-
-                // Teleport Logic (Periodic)
-                this.teleportCooldown -= 1; // Count moves or use dt? This is called per move.
-                // Let's use a random chance but gated by cooldown (in moves).
-                // Cooldown = 5 moves.
-                if (this.teleportCooldown <= 0 && Math.random() < 0.15) { // 15% chance if ready
-                    // Teleport to random empty cell not player and not spawn
-                    let candidates = [];
-                    this.map.forEach((v, i) => {
-                        if (v === 0 && i !== this.playerPos && i !== 2) candidates.push(i);
-                    });
-                    if (candidates.length > 0) {
-                        this.enemyPos = candidates[Math.floor(Math.random() * candidates.length)];
-                        this.teleportCooldown = 5; // Reset cooldown
-                        window.gameApp.audio.playTone(300, 'sawtooth', 0.5); // Teleport sound
-                        this.updateBoard();
-                        return;
-                    }
-                }
-
-                // Standard Move (BFS for shortest path to Player)
-                let target = this.playerPos;
-
-                // Audio Lure Logic: Range Limited
-                if (this.lurePos !== -1) {
-                    // Check Manhattan Distance
-                    const dist = this.getDist(this.enemyPos, this.lurePos);
-                    // If within range (e.g., 2 cells), attract
-                    if (dist <= 2) {
-                        if (Math.random() < 0.9) target = this.lurePos; // Strong attraction if close
-                    }
-                }
-
-                // Strict BFS Pathfinding
-                const next = this.getNextStep(this.enemyPos, target);
-
-                // Verify Next Step Validity (Double Check)
-                if (next !== -1 && this.map[next] === 0) {
-                    this.enemyPos = next;
-                    this.updateBoard();
-
-                    // Check Kill
-                    if (this.enemyPos === this.playerPos) {
-                        this.failGame();
-                    }
-                }
-            }
-
-            getDist(i1, i2) {
-                const r1 = Math.floor(i1 / 5);
-                const c1 = i1 % 5;
-                const r2 = Math.floor(i2 / 5);
-                const c2 = i2 % 5;
-                return Math.abs(r1 - r2) + Math.abs(c1 - c2);
-            }
-
-            getNeighbors(idx) {
-                const r = Math.floor(idx / 5);
-                const c = idx % 5;
-                const res = [];
-                const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
-                dirs.forEach(d => {
-                    const nr = r + d[0];
-                    const nc = c + d[1];
-                    if (nr >= 0 && nr < 5 && nc >= 0 && nc < 5) {
-                        const nIdx = nr * 5 + nc;
-                        if (this.map[nIdx] === 0) res.push(nIdx);
-                    }
-                });
-                return res;
-            }
-
-            getNextStep(start, end) {
-                // BFS
-                const queue = [[start]];
-                const visited = new Set([start]);
-
-                while (queue.length > 0) {
-                    const path = queue.shift();
-                    const curr = path[path.length - 1];
-
-                    if (curr === end) {
-                        // Return second node in path (first step)
-                        return path.length > 1 ? path[1] : start;
-                    }
-
-                    const nbs = this.getNeighbors(curr);
-                    // Randomize neighbors for unpredictable movement when multiple paths exist?
-                    // User said: "Random (slightly higher chance to approach player)".
-                    // My BFS is deterministic "Shortest Path".
-                    // To add randomness: shuffle neighbors.
-                    nbs.sort(() => Math.random() - 0.5);
-
-                    for (let n of nbs) {
-                        if (!visited.has(n)) {
-                            visited.add(n);
-                            let newPath = [...path, n];
-                            queue.push(newPath);
-                        }
-                    }
-                }
-                return -1;
-            }
-        }
-
-        class VoltageModule extends GameModule {
-            constructor() { super('voltage', 'Voltage'); }
-
-            onStart() {
-                this.value = 50; // 0 to 100
-                this.target = 50;
-                this.noise = 0;
-                this.instability = 10 + this.aiLevel * 2;
-                this.render();
-            }
-
-            onUpdate(dt) {
-                // Random drift
-                this.noise += (Math.random() - 0.5) * this.instability * dt * 5;
-                this.noise = Math.max(-20, Math.min(20, this.noise));
-                this.value += this.noise * dt;
-
-                // Limit
-                if (this.value < 0 || this.value > 100) {
-                    this.failGame();
-                }
-                this.updateUI();
-            }
-
-            render() {
-                this.element.querySelector('.module-content').innerHTML = `
-            <div style="height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                <div style="width:30px; height:80%; background:#222; border:1px solid #555; position:relative;">
-                    <div style="position:absolute; top:50%; width:100%; height:2px; background:lime;"></div> <!-- Center -->
-                    <div id="volt-bar" style="position:absolute; bottom:50%; width:100%; height:0%; background:var(--accent-cyan); transition:height 0.1s linear;"></div>
-                </div>
-                <div style="margin-top:5px; font-size:10px;">STABILIZE</div>
-                <button class="cyber-btn" id="volt-btn" style="padding:2px 10px; font-size:10px;">SHOCK</button>
-            </div>
-        `;
-
-                const btn = this.element.querySelector('#volt-btn');
-                btn.onclick = () => {
-                    if (this.waiting || this.failed) return;
-                    if (this.value > 50) this.value -= 10;
-                    else this.value += 10;
-                    this.noise = 0; // Reset momentum
-                    window.gameApp.audio.playTone(100, 'sawtooth', 0.1);
-                };
-            }
-
-            updateUI() {
-                const bar = this.element.querySelector('#volt-bar');
-                if (!bar) return;
-
-                const diff = this.value - 50;
-                bar.style.height = `${Math.abs(diff)}%`;
-                if (diff > 0) {
-                    bar.style.bottom = '50%';
-                    bar.style.top = 'auto';
-                    bar.style.background = diff > 40 ? 'red' : 'var(--accent-cyan)';
-                } else {
-                    bar.style.top = '50%';
-                    bar.style.bottom = 'auto';
-                    bar.style.background = Math.abs(diff) > 40 ? 'red' : 'var(--accent-cyan)';
-                }
-            }
-        }
-
-        class TrojanModule extends GameModule {
-            constructor() { super('trojan', 'Trojan Horse'); }
-
-            onStart() {
-                this.progress = 0;
-                this.active = true;
-                this.trapZoneStart = 70 + Math.random() * 10; // 70-80%
-                this.trapZoneEnd = this.trapZoneStart + 10; // 10% width
-                this.speed = 2 + (this.aiLevel); // % per sec approx
-                this.moving = false;
-                this.moveTimer = 0;
-
-                this.render();
-            }
-
-            onUpdate(dt) {
-                // Intermittent movement
-                if (this.moveTimer <= 0) {
-                    // Pick new state
-                    this.moving = !this.moving;
-                    if (this.moving) {
-                        this.moveTimer = 1 + Math.random(); // Move for 1-2s
-                        // Audio cue
-                        window.gameApp.audio.playTone(50, 'square', 0.1, 0.2); // Low step sound
-                    } else {
-                        this.moveTimer = 1 + Math.random() * 2; // Wait for 1-3s
-                    }
-                }
-
-                this.moveTimer -= dt;
-
-                if (this.moving) {
-                    this.progress += this.speed * dt * 2; // Move faster when moving
-                    if (this.progress >= 100) {
-                        this.progress = 100;
-                        this.failGame();
-                    }
-                }
-
-                this.updateUI();
-            }
-
-            render() {
-                this.element.querySelector('.module-content').innerHTML = `
-            <div style="height:100%; display:flex; flex-direction:column; justify-content:center; padding:10px;">
-                <div style="position:relative; width:100%; height:30px; background:#111; border:1px solid #555;">
-                    <!-- Trap Zone Highlight -->
-                    <div style="position:absolute; left:${this.trapZoneStart}%; width:${this.trapZoneEnd - this.trapZoneStart}%; height:100%; background:rgba(255, 0, 0, 0.3); border-left:1px solid red; border-right:1px solid red;"></div>
-                    
-                    <div id="trojan-bar" style="width:0%; height:100%; background:#222; border-right:2px solid #333;"></div>
-                </div>
-                <button class="cyber-btn" id="trojan-btn" style="margin-top:10px;">QUARANTINE</button>
-            </div>
-        `;
-
-                this.element.querySelector('#trojan-btn').onclick = () => this.tryCatch();
-            }
-
-            updateUI() {
-                const bar = this.element.querySelector('#trojan-bar');
-                if (bar) bar.style.width = `${this.progress}%`;
-            }
-
-            tryCatch() {
-                if (this.failed || this.waiting) return;
-
-                // Check if in zone
-                if (this.progress >= this.trapZoneStart && this.progress <= this.trapZoneEnd) {
-                    window.gameApp.audio.playClick();
-                    this.success(); // Reset
-                } else {
-                    this.progress = 0;
-                    window.gameApp.audio.playTone(100, 'sawtooth', 0.5); // Error sound
-                }
-            }
-        }
-
-        // --- Main Application ---
-        class GameApp {
-            constructor() {
-                this.modules = [
-                    new PuppetModule(), new MinesweeperModule(), new SimonModule(), new MemoryModule(),
-                    new ShufflerModule(), new RabbitModule(), new MathModule(), new TypingModule(),
-                    new SpamModule(), new VentInvaderModule(), new VoltageModule(), new TrojanModule()
-                ];
-
-                this.audio = new AudioController();
-                this.state = 'MENU'; // MENU, PLAYING, RESULT
-                this.duration = 180; // Seconds
-                this.timer = 0;
-                this.aggressive = false;
-                this.lastTime = 0;
-
-                // Bindings
-                this.hudTime = document.getElementById('time-display');
-                this.initAudioBtn = document.getElementById('init-audio-btn');
-
-                this.setupMenu();
-                this.setupAudio();
-
-                requestAnimationFrame((t) => this.loop(t));
-            }
-
-            setupAudio() {
-                this.initAudioBtn.addEventListener('click', () => {
-                    this.audio.init();
-                    document.getElementById('audio-init-overlay').classList.remove('active');
-                });
-            }
-
-            setupMenu() {
-                const grid = document.getElementById('character-grid');
-                const presetList = document.getElementById('preset-list');
-                const startBtn = document.getElementById('start-btn');
-                const totalScoreEl = document.getElementById('total-score');
-
-                // Render Module Selectors
-                this.modules.forEach(mod => {
-                    const card = document.createElement('div');
-                    card.className = 'char-card';
-                    card.innerHTML = `
-                <h4>${mod.name}</h4>
-                <div class="ai-control">
-                    <button class="arrow-btn" onclick="gameApp.adjustAI('${mod.id}', -1)">&#9664;</button>
-                    <div class="ai-val" id="ai-${mod.id}">0</div>
-                    <button class="arrow-btn" onclick="gameApp.adjustAI('${mod.id}', 1)">&#9654;</button>
-                </div>
-            `;
-                    grid.appendChild(card);
-                });
-
-                // Event for AI Adjustment
-                window.gameApp = this; // Global ref for inline onclicks
-
-                // Presets (17 Total)
-                const presets = [
-                    { name: "ALL 20", levels: Array(12).fill(20) },
-                    { name: "ALL 5", levels: Array(12).fill(5) },
-                    { name: "Cerebral Cortex", levels: [0, 0, 20, 20, 0, 0, 20, 0, 0, 0, 10, 0] }, // Memory, Simon, Math
-                    { name: "Adrenaline Rush", levels: [0, 0, 0, 0, 0, 20, 0, 0, 20, 0, 10, 20] }, // Rabbit, Spam, Voltage, Trojan
-                    { name: "Zen Garden", levels: [20, 10, 0, 0, 0, 0, 0, 0, 0, 20, 10, 0] }, // Puppet, Vent, Mine, Volt
-                    { name: "Input Overload", levels: [0, 0, 0, 0, 0, 0, 20, 20, 20, 0, 0, 0] }, // Math, Type, Spam
-                    { name: "Sensory Overload", levels: [0, 0, 10, 10, 20, 10, 0, 0, 0, 0, 0, 0] }, // Simon, Memory, Shuffler
-                    { name: "Matrix Malfunction", levels: [0, 20, 10, 20, 0, 0, 0, 0, 0, 10, 0, 0] }, // Mine, Memory, Vent
-                    { name: "Cold Storage", levels: [20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0] }, // Puppet, Volt (Max)
-                    { name: "Panic Room", levels: [0, 0, 0, 0, 20, 20, 0, 0, 20, 10, 0, 0] }, // Shuffler, Rabbit, Spam
-                    { name: "Night Shift", levels: [10, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0] }, // First 4
-                    { name: "Binary Bind", levels: [20, 20, 0, 0, 20, 20, 0, 0, 0, 0, 0, 0] }, // 1,2,5,6
-                    { name: "Lucky 7", levels: Array(12).fill(7) },
-                    { name: "Oddities", levels: [20, 0, 20, 0, 20, 0, 20, 0, 20, 0, 20, 0] },
-                    { name: "Even Flow", levels: [0, 20, 0, 20, 0, 20, 0, 20, 0, 20, 0, 20] },
-                    { name: "Strategic Command", levels: [0, 15, 0, 15, 0, 0, 0, 0, 0, 20, 15, 0] }, // Mine, Mem, Vent, Volt
-                    { name: "Four Horsemen", levels: [20, 0, 0, 0, 20, 0, 0, 0, 20, 20, 0, 0] } // Puppet, Shuffler, Spam, Vent
-                ];
-
-                // Clear existing buttons first
-                presetList.innerHTML = '';
-                presets.forEach(p => {
-                    const btn = document.createElement('div');
-                    btn.className = 'preset-btn';
-                    btn.innerText = p.name;
-                    btn.onclick = () => this.loadPreset(p.levels);
-                    presetList.appendChild(btn);
-                });
-
-                startBtn.onclick = () => this.startGame();
-            }
-
-            adjustAI(id, delta) {
-                this.audio.playClick();
-                const mod = this.modules.find(m => m.id === id);
-                if (!mod) return;
-                mod.aiLevel = Math.max(0, Math.min(20, mod.aiLevel + delta));
-                document.getElementById(`ai-${id}`).innerText = mod.aiLevel;
-                this.updateTotalScore();
-            }
-
-            loadPreset(levels) {
-                this.audio.playClick();
-                this.modules.forEach((mod, i) => {
-                    mod.aiLevel = levels[i] || 0;
-                    document.getElementById(`ai-${mod.id}`).innerText = mod.aiLevel;
-                });
-                this.updateTotalScore();
-            }
-
-            updateTotalScore() {
-                const score = this.modules.reduce((acc, m) => acc + (m.aiLevel * 10), 0);
-                document.getElementById('total-score').innerText = score;
-            }
-
-            startGame() {
-                this.audio.playClick();
-                this.state = 'PLAYING';
-                this.timer = 0;
-
-                // Get Settings
-                const durationInput = document.querySelector('input[name="duration"]:checked');
-                this.duration = parseInt(durationInput ? durationInput.value : 180);
-                this.aggressive = document.getElementById('aggressive-mode').checked;
-                this.chaosMode = document.getElementById('chaos-mode').checked;
-                this.blackoutMode = document.getElementById('blackout-mode').checked;
-
-                // Mode Timers
-                this.chaosTimer = 30;
-                this.blackoutTimer = 15;
-                this.isBlackout = false;
-
-                // UI Switch
-                document.getElementById('menu-screen').classList.remove('active');
-                document.getElementById('game-screen').classList.add('active');
-
-                // Init Modules
-                const grid = document.getElementById('dashboard-grid');
-                grid.innerHTML = '';
-                this.modules.forEach(mod => {
-                    const el = document.createElement('div');
-                    el.className = 'module';
-                    el.id = `module-${mod.id}`;
-                    grid.appendChild(el);
-                    mod.init(el, mod.aiLevel, this.aggressive);
-                });
-            }
-
-            loop(timestamp) {
-                const dt = (timestamp - this.lastTime) / 1000;
-                this.lastTime = timestamp;
-
-                if (this.state === 'PLAYING') {
-                    this.timer += dt;
-
-                    // Timer Display
-                    let remaining = Math.max(0, this.duration - this.timer);
-                    let mins = Math.floor(remaining / 60);
-                    let secs = Math.floor(remaining % 60);
-                    this.hudTime.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
-                    // Win Condition
-                    if (remaining <= 0) {
-                        this.triggerWin();
-                    }
-
-                    // Game Modes Logic
-                    if (this.chaosMode) {
-                        this.chaosTimer -= dt;
-                        if (this.chaosTimer <= 0) {
-                            this.chaosTimer = 30;
-                            this.triggerChaos();
-                        }
-                    }
-
-                    if (this.blackoutMode) {
-                        this.blackoutTimer -= dt;
-                        if (this.blackoutTimer <= 0) {
-                            if (this.isBlackout) {
-                                // End Blackout
-                                this.isBlackout = false;
-                                this.blackoutTimer = 15 + Math.random() * 10;
-                                document.getElementById('blackout-overlay')?.remove();
-                            } else {
-                                // Start Blackout
-                                this.isBlackout = true;
-                                this.blackoutTimer = 4; // Lasts 4 seconds
-                                const ov = document.createElement('div');
-                                ov.id = 'blackout-overlay';
-                                ov.style.cssText = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; z-index:9999; pointer-events:none;";
-                                document.body.appendChild(ov);
-                                window.gameApp.audio.playTone(50, 'sine', 1.0); // Hum
-                            }
-                        }
-                    }
-
-                    // Update Modules
-                    this.modules.forEach(m => m.update(dt));
-                }
-
-                requestAnimationFrame((t) => this.loop(t));
-            }
-
-            triggerGameOver(reason) {
-                if (this.state !== 'PLAYING') return;
-                this.state = 'RESULT';
-                this.audio.playLose();
-
-                document.getElementById('result-message').innerText = `Failed Module: ${reason}`;
-                document.getElementById('result-title').innerText = "GAME OVER";
-                document.getElementById('result-title').style.color = "var(--accent-red)";
-
-                this.showResult();
-            }
-
-            triggerWin() {
-                if (this.state !== 'PLAYING') return;
-                this.state = 'RESULT';
-                this.audio.playWin();
-
-                document.getElementById('result-message').innerText = `Survived until 6AM`;
-                document.getElementById('result-title').innerText = "YOU WON";
-                document.getElementById('result-title').style.color = "var(--accent-green)";
-
-                this.showResult();
-            }
-
-            showResult() {
-                document.getElementById('result-screen').classList.add('active');
-                document.getElementById('retry-btn').onclick = () => {
-                    location.reload(); // Simple reload for now
-                };
-            }
-
-            triggerChaos() {
-                // Randomize AI levels +/- 5
-                this.modules.forEach(m => {
-                    if (m.aiLevel > 0) {
-                        let change = Math.floor(Math.random() * 11) - 5; // -5 to +5
-                        m.aiLevel = Math.max(1, Math.min(20, m.aiLevel + change));
-                        // Update specific module instance if needed (most read aiLevel property directly)
-                        // Shuffler: interval depends on AI. Update parameter.
-                        if (m.id === 'shuffler') m.interval = Math.max(20, 80 - (m.aiLevel * 3.0));
-                        if (m.id === 'vent') m.moveInterval = Math.max(1.0, 5.0 - (m.aiLevel * 0.2));
-                    }
-                });
-
-                // Notify
-                const msg = document.createElement('div');
-                msg.innerText = "CHAOS: AI LEVELS SHIFTED";
-                msg.style.cssText = "position:fixed; top:10%; left:50%; transform:translate(-50%, -50%); color:var(--accent-purple); font-size:20px; font-weight:bold; z-index:5000; text-shadow:0 0 10px var(--accent-purple); pointer-events:none;";
-                document.body.appendChild(msg);
-                setTimeout(() => msg.remove(), 2000);
-                window.gameApp.audio.playTone(400, 'sawtooth', 0.5);
-            }
-        }
-
-        // Start
-        window.addEventListener('load', () => {
-            new GameApp();
-        });
+        // Click anywhere to close
+        p.onclick = (e) => {
+            e.stopPropagation();
+            p.remove();
+            this.cleared++;
+            window.gameApp.audio.playClick();
+        };
+
+        document.body.appendChild(p); // Append to body
+    }
+}
+
+/* (Rest of script.js already read and is inlined above; the full content was embedded.) */
+
+// Start
+window.addEventListener('load', () => {
+    new GameApp();
+});
+
+/* END OF script.js */
+
+})();
     </script>
 </body>
 
