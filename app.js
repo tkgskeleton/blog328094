@@ -73,7 +73,7 @@ app.get("/custom", (req, res) => {
 });
 
 app.get("/custom2", (req, res) => {
-    res.render("custom2");
+    res.render("custom2", { title: 'Custom Night Ultimate' });
 });
 
 app.listen(port, () => {

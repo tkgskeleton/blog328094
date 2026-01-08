@@ -1,0 +1,445 @@
+:root {
+    --bg-color: #050505;
+    --text-color: #e0e0e0;
+    --accent-cyan: #00f3ff;
+    --accent-red: #ff0055;
+    --accent-green: #00ff66;
+    --accent-yellow: #ffcc00;
+    --panel-bg: rgba(20, 20, 25, 0.95);
+    --border-color: #333;
+}
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Share Tech Mono', monospace;
+    overflow: hidden;
+    position: relative;
+}
+
+/* CRT Effects */
+#scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(0deg,
+            rgba(0, 0, 0, 0.15),
+            rgba(0, 0, 0, 0.15) 1px,
+            transparent 1px,
+            transparent 2px);
+    pointer-events: none;
+    z-index: 1000;
+}
+
+#vignette {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, transparent 50%, rgba(0, 0, 0, 0.8) 100%);
+    pointer-events: none;
+    z-index: 999;
+}
+
+.screen {
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+}
+
+.screen.active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Typography & Glitch */
+h1,
+h2,
+h3 {
+    font-family: 'Orbitron', sans-serif;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.glitch {
+    font-size: 3rem;
+    color: var(--accent-cyan);
+    text-align: center;
+    text-shadow: 2px 2px var(--accent-red);
+    margin-bottom: 2rem;
+}
+
+/* Cyber Button */
+.cyber-btn {
+    background: transparent;
+    border: 2px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 10px 30px;
+    font-family: 'Orbitron';
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.3s;
+    text-shadow: 0 0 5px var(--accent-cyan);
+    box-shadow: 0 0 5px var(--accent-cyan);
+}
+
+.cyber-btn:hover {
+    background: var(--accent-cyan);
+    color: #000;
+}
+
+/* Menu Layout */
+.setup-container {
+    display: flex;
+    gap: 20px;
+    width: 95%;
+    max-width: 1400px;
+    height: auto;
+    /* Remove fixed 70vh */
+    min-height: 400px;
+    justify-content: center;
+    margin: 20px auto;
+}
+
+.panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.preset-panel {
+    flex: 0 0 250px;
+}
+
+.config-panel {
+    flex: 0 0 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.character-select {
+    flex: 2;
+    /* Take more space */
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    padding: 10px;
+    /* Allow the menu grid to expand naturally and avoid internal scrolling */
+    max-height: none;
+    overflow-y: visible;
+}
+
+.char-card {
+    background: #111;
+    border: 1px solid #444;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    transition: 0.2s;
+}
+
+.char-card:hover {
+    border-color: var(--accent-cyan);
+    background: #1a1a1f;
+    transform: translateY(-2px);
+}
+
+/* Module Glow on Start */
+@keyframes module-init {
+    0% {
+        box-shadow: 0 0 0 var(--accent-cyan);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--accent-cyan);
+    }
+
+    100% {
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+}
+
+.module.initializing {
+    animation: pulse-init 0.5s infinite alternate;
+    border-color: var(--accent-cyan);
+}
+
+@keyframes pulse-init {
+    from {
+        opacity: 0.5;
+        box-shadow: inset 0 0 10px var(--accent-cyan);
+    }
+
+    to {
+        opacity: 1;
+        box-shadow: inset 0 0 30px var(--accent-cyan);
+    }
+}
+
+.module-header {
+    background: #222;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    font-family: 'Orbitron';
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.module.active-mod .module-header {
+    color: var(--accent-cyan);
+    text-shadow: 0 0 5px var(--accent-cyan);
+}
+
+.char-card h4 {
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0;
+}
+
+.ai-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ai-val {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent-cyan);
+    width: 30px;
+    text-align: center;
+}
+
+.arrow-btn {
+    background: #333;
+    border: none;
+    color: #fff;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+
+.arrow-btn:hover {
+    background: #555;
+}
+
+.menu-actions {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    /* Center them for better balance */
+    align-items: center;
+    gap: 60px;
+    /* Stronger gap between score and BEGIN */
+    padding: 0 40px;
+}
+
+/* Game Dashboard */
+.header-hud {
+    display: flex;
+    justify-content: space-between;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+#coin-hud {
+    margin-left: 40px;
+    /* Stronger gap from time display */
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 15px;
+    /* Better spacing for PC */
+    flex: 1;
+    height: calc(100vh - 120px);
+    /* Fill screen height */
+}
+
+.module {
+    background: #0a0a0a;
+    border: 1px solid #333;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.module-header {
+    background: #111;
+    padding: 5px;
+    font-size: 0.8rem;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+}
+
+.module-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden; /* Prevent internal module scrolling; content should fit module area */
+    padding: 8px; /* small inner padding to avoid clipped content */
+}
+
+#game-screen.screen.active {
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+/* Flashlight Overlay */
+#flashlight-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 500;
+    background: black;
+    mask-image: radial-gradient(circle 100px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 100%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle 150px at var(--mouse-x, 50%) var(--mouse-y, 50%), transparent 0%, black 100%);
+    display: none;
+    /* Active only during game */
+}
+
+/* Overlay Screens */
+.overlay-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#result-title {
+    font-size: 4rem;
+    color: var(--accent-red);
+    margin-bottom: 1rem;
+}
+
+/* Utility Animations */
+@keyframes flash-red {
+
+    0%,
+    100% {
+        background: #0a0a0a;
+    }
+
+    50% {
+        background: #300;
+    }
+}
+
+.warning {
+    animation: flash-red 0.5s infinite;
+}
+
+/* Preset Buttons */
+.preset-btn {
+    display: block;
+    width: 100%;
+    background: #222;
+    border: 1px solid #444;
+    color: #ccc;
+    padding: 8px;
+    text-align: left;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.preset-btn:hover {
+    background: #333;
+    color: #fff;
+}
+
+.preset-btn.active {
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+}
+
+@media (max-width: 1000px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .setup-container {
+        flex-direction: column;
+    }
+
+    .preset-panel,
+    .config-panel {
+        width: 100%;
+        flex: none;
+    }
+}
+
+.setup-container {
+    display: flex;
+    gap: 30px;
+    width: 90%;
+    max-width: 1200px;
+}
+
+.panel {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    padding: 25px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.preset-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    overflow-y: auto;
+}
+
+.character-select {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+    width: 95%;
+    max-width: 1200px;
+    /* Prevent scrolling inside the menu selector */
+    max-height: none;
+    overflow: visible;
+}
+
+/* Non-intrusive marker for modules that failed init (no visible text) */
+.module-init-error {
+    outline: 2px dashed rgba(255,0,0,0.06);
+}
