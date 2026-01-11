@@ -1033,9 +1033,22 @@ class VentInvaderModule extends GameModule {
         if (this.teleportCooldown <= 0 && Math.random() < 0.15) { // 15% chance if ready
             // Teleport to random empty cell not player and not spawn
             let candidates = [];
+            // Build basic candidates (walkable, not player, not reserved spawn index)
             this.map.forEach((v, i) => {
                 if (v === 0 && i !== this.playerPos && i !== 2) candidates.push(i);
             });
+
+            // Exclude immediate horizontal neighbors of the player's target (bottom-center)
+            // to avoid teleporting the enemy to (playerCol-1, playerRow) or (playerCol+1, playerRow)
+            // which would cause an instant loss before the player can react.
+            if (typeof this.playerPos === 'number') {
+                const forbidden = new Set();
+                const prow = Math.floor(this.playerPos / this.cols);
+                const pcol = this.playerPos % this.cols;
+                if (pcol - 1 >= 0) forbidden.add(prow * this.cols + (pcol - 1));
+                if (pcol + 1 < this.cols) forbidden.add(prow * this.cols + (pcol + 1));
+                candidates = candidates.filter(c => !forbidden.has(c));
+            }
             if (candidates.length > 0) {
                 this.enemyPos = candidates[Math.floor(Math.random() * candidates.length)];
                 this.teleportCooldown = 5; // Reset cooldown
@@ -1624,9 +1637,28 @@ class GameApp {
         if (inactive.length > 0) {
             const m = inactive[Math.floor(Math.random() * inactive.length)];
             m.aiLevel = Math.floor(Math.random() * 10) + 5; // 5-15
-            m.init(m.element, m.aiLevel, this.aggressive);
-            this.showNotification(`NEW CHALLENGER: ${m.name}`, "white");
-            this.audio.playAlarm();
+
+            // Ensure the module has a DOM element; if not, try to find or create one.
+            let el = m.element || document.getElementById(`module-${m.id}`);
+            if (!el) {
+                const grid = document.getElementById('dashboard-grid');
+                if (grid) {
+                    el = document.createElement('div');
+                    el.className = 'module';
+                    el.id = `module-${m.id}`;
+                    grid.appendChild(el);
+                }
+            }
+
+            try {
+                m.init(el, m.aiLevel, this.aggressive);
+                this.showNotification(`NEW CHALLENGER: ${m.name}`, "white");
+                this.audio.playAlarm();
+            } catch (err) {
+                // Prevent an exception here from killing the main RAF loop.
+                console.error('triggerRandomEvent init error for', m.id, err);
+                this.showNotification(`ERROR SPAWNING: ${m.name}`, "var(--accent-red)");
+            }
         }
     }
 
