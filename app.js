@@ -76,6 +76,10 @@ app.get("/custom2", (req, res) => {
     res.render("custom2", { title: 'Custom Night Ultimate' });
 });
 
+app.get("/typing", (req, res) => {
+    res.render("typing", { title: 'Typing Practice' });
+});
+
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });

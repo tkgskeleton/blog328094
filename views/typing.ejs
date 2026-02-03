@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>コピペタイピング - タイピング練習</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/TypingStyle.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header class="header">
+            <h1 class="title">コピペタイピング</h1>
+            <p class="subtitle">ペーストした文章でタイピング練習</p>
+        </header>
+
+        <!-- 統計情報パネル -->
+        <div class="stats-panel">
+            <div class="stat-item">
+                <span class="stat-label">タイム</span>
+                <span class="stat-value" id="time">00:00</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">BPM</span>
+                <span class="stat-value" id="bpm">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">打鍵数</span>
+                <span class="stat-value" id="keystrokes">0</span>
+            </div>
+        </div>
+
+        <!-- セットアップモード -->
+        <div id="setup-mode" class="setup-mode">
+            <div class="setup-content">
+                <h2 class="setup-title">練習用テキストを入力</h2>
+                <textarea id="text-input" class="text-input"
+                    placeholder="タイピング練習したい文章をここにペーストしてください...&#10;&#10;例：&#10;吾輩は猫である。名前はまだ無い。&#10;どこで生れたかとんと見当がつかぬ。&#10;何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。"></textarea>
+                <button id="start-btn" class="btn btn-primary">スタート</button>
+            </div>
+        </div>
+
+        <!-- タイピングモード -->
+        <div id="typing-mode" class="typing-mode" style="display: none;">
+            <div class="typing-area">
+                <div class="current-line-label">現在の行:</div>
+                <div id="target-text" class="target-text"></div>
+                <div id="typed-text" class="typed-text"></div>
+                <input type="text" id="typing-input" class="typing-input" autocomplete="off" spellcheck="false">
+                <div class="progress-info">
+                    <span id="line-progress">1 / 1</span>
+                </div>
+            </div>
+            <button id="reset-btn" class="btn btn-secondary">リセット</button>
+        </div>
+
+        <!-- 完了モード -->
+        <div id="complete-mode" class="complete-mode" style="display: none;">
+            <div class="complete-content">
+                <h2 class="complete-title">🎉 完了！</h2>
+                <div class="final-stats">
+                    <div class="final-stat">
+                        <span class="final-stat-label">タイム</span>
+                        <span class="final-stat-value" id="final-time">00:00</span>
+                    </div>
+                    <div class="final-stat">
+                        <span class="final-stat-label">平均BPM</span>
+                        <span class="final-stat-value" id="final-bpm">0</span>
+                    </div>
+                    <div class="final-stat">
+                        <span class="final-stat-label">総打鍵数</span>
+                        <span class="final-stat-value" id="final-keystrokes">0</span>
+                    </div>
+                </div>
+                <button id="retry-btn" class="btn btn-primary">もう一度</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/TypingScript.js"></script>
+</body>
+
+</html>

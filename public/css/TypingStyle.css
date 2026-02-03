@@ -1,0 +1,454 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Backrooms風カラーパレット */
+    --bg-primary: #d4c5a0;
+    --bg-secondary: #e8dcc4;
+    --bg-card: #f2ead8;
+    --accent: #7a6f4d;
+    --accent-dark: #5a5038;
+    --text-primary: #3a3528;
+    --text-secondary: #6b6250;
+    --text-muted: #8a7d65;
+    --fluorescent: #f4f1d0;
+    --fluorescent-glow: rgba(244, 241, 208, 0.6);
+    --shadow: rgba(90, 80, 56, 0.15);
+    --shadow-dark: rgba(58, 53, 40, 0.25);
+    --border: #c4b89a;
+    --success: #6b8e23;
+    --error: #8b4513;
+    --border-radius: 4px;
+}
+
+body {
+    font-family: 'Noto Sans JP', 'Courier New', monospace;
+    background:
+        repeating-linear-gradient(0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.02) 2px,
+            rgba(0, 0, 0, 0.02) 4px),
+        linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    position: relative;
+}
+
+/* 蛍光灯効果 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: linear-gradient(180deg, var(--fluorescent-glow) 0%, transparent 100%);
+    pointer-events: none;
+    animation: flicker 8s infinite;
+}
+
+@keyframes flicker {
+
+    0%,
+    19%,
+    21%,
+    23%,
+    25%,
+    54%,
+    56%,
+    100% {
+        opacity: 1;
+    }
+
+    20%,
+    24%,
+    55% {
+        opacity: 0.85;
+    }
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    position: relative;
+}
+
+/* ヘッダー */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    text-shadow: 2px 2px 4px var(--shadow);
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent-dark);
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+    font-family: 'Courier New', monospace;
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+/* 統計情報パネル */
+.stats-panel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-item {
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    border-radius: var(--border-radius);
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow:
+        4px 4px 8px var(--shadow),
+        inset 0 0 20px var(--fluorescent-glow);
+    transition: all 0.2s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        6px 6px 12px var(--shadow-dark),
+        inset 0 0 25px var(--fluorescent-glow);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Courier New', monospace;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--accent-dark);
+    font-variant-numeric: tabular-nums;
+    font-family: 'Courier New', monospace;
+}
+
+/* セットアップモード */
+.setup-mode {
+    background: var(--bg-card);
+    border: 3px solid var(--accent);
+    border-radius: var(--border-radius);
+    padding: 40px;
+    box-shadow:
+        8px 8px 16px var(--shadow-dark),
+        inset 0 0 40px var(--fluorescent-glow);
+}
+
+.setup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.setup-title {
+    font-size: 1.25rem;
+    color: var(--accent-dark);
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+}
+
+.text-input {
+    width: 100%;
+    min-height: 240px;
+    background: var(--fluorescent);
+    border: 2px solid var(--accent);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    font-family: 'Noto Sans JP', 'Courier New', monospace;
+    font-size: 1rem;
+    color: var(--text-primary);
+    resize: vertical;
+    outline: none;
+    transition: all 0.2s ease;
+    line-height: 1.6;
+    box-shadow: inset 2px 2px 4px var(--shadow);
+}
+
+.text-input:focus {
+    border-color: var(--accent-dark);
+    background: var(--bg-card);
+    box-shadow: inset 2px 2px 6px var(--shadow-dark);
+}
+
+.text-input::placeholder {
+    color: var(--text-muted);
+}
+
+/* タイピングモード */
+.typing-mode {
+    background: var(--bg-card);
+    border: 3px solid var(--accent);
+    border-radius: var(--border-radius);
+    padding: 40px;
+    box-shadow:
+        8px 8px 16px var(--shadow-dark),
+        inset 0 0 40px var(--fluorescent-glow);
+}
+
+.typing-area {
+    margin-bottom: 32px;
+}
+
+.current-line-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Courier New', monospace;
+}
+
+.target-text {
+    font-size: 1.375rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    padding: 24px;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    min-height: 80px;
+    font-weight: 400;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    border: 2px solid var(--border);
+    box-shadow: inset 2px 2px 4px var(--shadow);
+}
+
+.typed-text {
+    font-size: 1.375rem;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    padding: 24px;
+    background: var(--fluorescent);
+    border-radius: var(--border-radius);
+    min-height: 80px;
+    border: 3px solid var(--accent-dark);
+    font-weight: 500;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    box-shadow:
+        inset 2px 2px 6px var(--shadow),
+        0 0 15px var(--fluorescent-glow);
+}
+
+.char-correct {
+    color: var(--success);
+    font-weight: 700;
+}
+
+.char-incorrect {
+    color: var(--error);
+    background: rgba(139, 69, 19, 0.2);
+    border-radius: 2px;
+    padding: 0 2px;
+    font-weight: 700;
+}
+
+.typing-input {
+    width: 100%;
+    padding: 16px 20px;
+    font-family: 'Noto Sans JP', 'Courier New', monospace;
+    font-size: 1.125rem;
+    background: var(--fluorescent);
+    border: 2px solid var(--accent);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.2s ease;
+    box-shadow: inset 2px 2px 4px var(--shadow);
+}
+
+.typing-input:focus {
+    border-color: var(--accent-dark);
+    box-shadow: inset 2px 2px 6px var(--shadow-dark);
+}
+
+.progress-info {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+/* 完了モード */
+.complete-mode {
+    background: var(--bg-card);
+    border: 3px solid var(--accent);
+    border-radius: var(--border-radius);
+    padding: 40px;
+    box-shadow:
+        8px 8px 16px var(--shadow-dark),
+        inset 0 0 40px var(--fluorescent-glow);
+}
+
+.complete-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+}
+
+.complete-title {
+    font-size: 2.25rem;
+    color: var(--accent-dark);
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    text-shadow: 2px 2px 4px var(--shadow);
+}
+
+.final-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    width: 100%;
+}
+
+.final-stat {
+    background: var(--bg-secondary);
+    border: 2px solid var(--accent);
+    border-radius: var(--border-radius);
+    padding: 32px 20px;
+    text-align: center;
+    box-shadow:
+        4px 4px 8px var(--shadow),
+        inset 0 0 20px var(--fluorescent-glow);
+}
+
+.final-stat-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Courier New', monospace;
+}
+
+.final-stat-value {
+    display: block;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--accent-dark);
+    font-variant-numeric: tabular-nums;
+    font-family: 'Courier New', monospace;
+}
+
+/* ボタン */
+.btn {
+    padding: 14px 32px;
+    font-family: 'Noto Sans JP', 'Courier New', monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: var(--fluorescent);
+    box-shadow: 4px 4px 8px var(--shadow-dark);
+    border: 2px solid var(--accent-dark);
+}
+
+.btn-primary:hover {
+    background: var(--accent-dark);
+    box-shadow: 6px 6px 12px var(--shadow-dark);
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 2px 2px 4px var(--shadow);
+}
+
+.btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--accent-dark);
+    border: 2px solid var(--accent);
+    box-shadow: 2px 2px 4px var(--shadow);
+}
+
+.btn-secondary:hover {
+    background: var(--fluorescent);
+    border-color: var(--accent-dark);
+    box-shadow: 4px 4px 8px var(--shadow-dark);
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+    body {
+        padding: 20px 16px;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .stats-panel,
+    .final-stats {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .stat-item {
+        padding: 20px;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .target-text,
+    .typed-text {
+        font-size: 1.125rem;
+        padding: 20px;
+    }
+
+    .typing-input {
+        font-size: 1rem;
+    }
+
+    .setup-mode,
+    .typing-mode,
+    .complete-mode {
+        padding: 24px;
+    }
+}
