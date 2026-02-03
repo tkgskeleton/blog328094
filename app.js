@@ -4,7 +4,7 @@ const path = require("path");
 const marked = require("marked");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // CommonJSでは __dirname と __filename は自動的に利用可能
 app.set("views", path.join(__dirname, 'views'));
